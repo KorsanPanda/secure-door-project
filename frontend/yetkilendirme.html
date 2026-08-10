@@ -1,72 +1,146 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kullanıcı Yetkilendirme | Okul Erişim Kontrolü</title>
-  <link rel="stylesheet" href="style.css?v=20260807-4">
-  <script src="auth-guard.js?v=20260807-4"></script>
-  <script src="script.js?v=20260807-4" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yetkilendirme · SecureLab</title>
+<script>(function(){try{var t=localStorage.getItem('securelab-theme');if(t!=='dark'&&t!=='light'){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/css/tokens.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/base.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/layout.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/components.css?v=20260811-1">
 </head>
-<body data-page="authorization" data-auth-required="true" data-roles="admin">
-  <div class="app-shell">
-    <nav class="navbar" id="main-navigation" aria-label="Ana navigasyon">
-      <div class="brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span><div class="brand-copy"><div class="logo">SecureLab</div><small>Erişim Yönetim Platformu</small></div></div>
-      <div class="nav-section-label">Yönetim</div>
-      <div class="nav-links">
-        <a href="index.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg><span>Ana Sayfa</span></a>
-        <a href="gecici-sifre.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m12 11 8-8M15 6l3 3M17 4l3 3"/></svg><span>Geçici Şifre</span></a>
-        <a href="gecmis-girisler.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg><span>Giriş Geçmişi</span></a>
-        <a class="active" href="yetkilendirme.html" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg><span>Yetkilendirme</span></a>
-        <a href="ariza-gecmisi.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.7 6.3a4 4 0 0 0-5-5L7 4l3 3 2.7-2.7a4 4 0 0 0 2 2Z"/><path d="m5 8-3 3 10 10 3-3M14 16l6-6 2 2-6 6"/></svg><span>Arıza Geçmişi</span></a>
-        <a class="logout-link" href="login.html"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg><span>Çıkış Yap</span></a>
-      </div>
-      <div class="sidebar-meta"><div class="sidebar-meta-row"><span class="sidebar-avatar">EY</span><div><strong>Erişim Yöneticisi</strong><small>Yetki kontrolü</small></div></div></div>
+<body data-page="yetkilendirme" data-breadcrumb="Yetkilendirme">
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <a href="index.html" class="sidebar-brand-link">
+        <span class="sidebar-brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 9.5-4-1.2-7-5-7-9.5V6l7-3Z"></path><path d="M9.5 12l1.8 1.8L14.7 10"></path></svg>
+        </span>
+        <span class="sidebar-brand-text">SecureLab</span>
+      </a>
+    </div>
+    <nav class="sidebar-nav" aria-label="Ana menü">
+      <a href="index.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg>
+        <span>Panel</span>
+      </a>
+      <a href="admin.html" class="sidebar-link" data-role="admin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-1.5a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4V20"></path><circle cx="10" cy="7.5" r="3.5"></circle><path d="M19.5 20v-1.2a3.3 3.3 0 0 0-2.3-3.15"></path><path d="M15.3 4.2a3.5 3.5 0 0 1 0 6.6"></path></svg>
+        <span>Kullanıcılar</span>
+      </a>
+      <a href="yetkilendirme.html" class="sidebar-link" data-role="admin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15.5" r="4"></circle><path d="M11 12.5 18.5 5M16.5 7 19 9.5M13.7 9.8l2 2"></path></svg>
+        <span>Yetkilendirme</span>
+      </a>
+      <a href="gecmis-girisler.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2.5"></path><path d="M9 2.5h6"></path></svg>
+        <span>Erişim Geçmişi</span>
+      </a>
+      <a href="ariza-gecmisi.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.3L4 17v3h3l5.4-5.3a4 4 0 0 1 5.3-5.4l-2.6 2.6-2-2 2.6-2.6Z"></path></svg>
+        <span>Arıza Geçmişi</span>
+      </a>
+      <a href="qr-kod.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="6" height="6" rx="1"></rect><rect x="14.5" y="3.5" width="6" height="6" rx="1"></rect><rect x="3.5" y="14.5" width="6" height="6" rx="1"></rect><path d="M14.5 14.5h3v3M20.5 14.5v2M14.5 20.5h3M20.5 20.5v-1"></path></svg>
+        <span>QR Kod</span>
+      </a>
+      <a href="gecici-sifre.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15.5" r="4"></circle><path d="M11 12.5 19 4.5M16.3 7.2l2.3 2.3M19 4.5l1.6 1.6"></path></svg>
+        <span>Geçici Şifre</span>
+      </a>
+      <a href="hesabim.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"></circle><path d="M5 20a7 7 0 0 1 14 0"></path></svg>
+        <span>Hesabım</span>
+      </a>
     </nav>
-    <div class="menu-backdrop" aria-hidden="true"></div>
+    <div class="sidebar-footer">SecureLab Erişim Kontrol Paneli</div>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-    <main class="main-panel">
-      <button type="button" class="menu-toggle floating-menu-toggle" aria-expanded="false" aria-controls="main-navigation" aria-label="Menüyü aç"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
-      <header class="topbar"><div class="topbar-context"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="M9 12h6M12 9v6"/></svg><span>Güvenlik / Yetki Yönetimi</span></div><span class="system-pill" id="authorization-system-state">Yetkiler yükleniyor</span></header>
+  <div class="app-body">
+    <header class="topbar">
+      <button type="button" class="topbar-menu-btn" id="menuToggle" aria-label="Menüyü aç" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+      </button>
+      <nav class="topbar-breadcrumb" aria-label="Konum">
+        <a href="index.html">Ana Sayfa</a>
+        <span class="topbar-breadcrumb-sep">/</span>
+        <span class="topbar-breadcrumb-current" id="breadcrumbCurrent">Yetkilendirme</span>
+      </nav>
+      <div class="topbar-actions" id="topbarActions">
+        <a href="hesabim.html" class="topbar-profile">
+          <span class="topbar-profile-avatar" id="profileAvatar">--</span>
+          <span class="topbar-profile-meta">
+            <span class="topbar-profile-name" id="profileName">Yükleniyor…</span>
+            <span class="badge badge-neutral" id="profileRoleBadge">—</span>
+          </span>
+        </a>
+        <button type="button" class="btn btn-ghost btn-sm" id="logoutBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"></path><path d="M16 16l4-4-4-4"></path><path d="M20 12H9"></path></svg>
+          <span>Çıkış Yap</span>
+        </button>
+      </div>
+    </header>
 
-      <div class="container">
-        <section class="page-header">
-          <div><div class="eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>Erişim politikası</div><h1 class="page-title">Kart ve Yetki Yönetimi</h1><p class="page-subtitle page-description">Kullanıcıların RFID kartlarını ve laboratuvar erişim durumlarını güvenli biçimde yönetin.</p></div>
-          <div class="header-actions page-actions"><span class="badge badge-success" id="auth-user-count-badge">— tanımlı kullanıcı</span></div>
-        </section>
+    <main class="main-content">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h1 class="page-title">Yetkilendirme</h1>
+          <p class="page-description">Onay bekleyen kart taleplerini yönetin, canlı kart okumalarını izleyin ve mevcut yetkilendirmeleri düzenleyin.</p>
+        </div>
+      </div>
 
-        <section class="metrics-grid">
-          <article class="metric-card"><div class="metric-top"><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></span><span class="badge badge-info">Toplam</span></div><div class="metric-label">Tanımlı Kullanıcı</div><div class="metric-value" id="authorization-user-count">—</div><div class="metric-detail">Backend kullanıcı kayıtları</div></article>
-          <article class="metric-card"><div class="metric-top"><span class="metric-icon success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m5 12 4 4L19 6"/></svg></span><span class="badge badge-success">Yetkili</span></div><div class="metric-label">Aktif Yetki</div><div class="metric-value" id="authorization-active-count">—</div><div class="metric-detail">Laboratuvara erişebilir</div></article>
-          <article class="metric-card"><div class="metric-top"><span class="metric-icon warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6 6 18M6 6l12 12"/></svg></span><span class="badge badge-danger">Engelli</span></div><div class="metric-label">Pasif Yetki</div><div class="metric-value" id="authorization-passive-count">—</div><div class="metric-detail">Erişimi durdurulmuş kayıt</div></article>
-          <article class="metric-card"><div class="metric-top"><span class="metric-icon info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="18" height="14" x="3" y="5" rx="2"/><path d="M3 10h18"/></svg></span><span class="badge badge-info" id="latest-card-state">Canlı</span></div><div class="metric-label">Son Okutulan Kart</div><div class="metric-value metric-value-code" id="latest-card-uid">—</div><div class="metric-detail" id="latest-card-detail">Kart okuyucu sorgulanıyor</div></article>
+      <div class="two-col mb-lg">
+        <section class="card-box" data-role="admin">
+          <div class="card-box-header">
+            <div>
+              <div class="card-box-title">Onay Bekleyen Kartlar</div>
+              <div class="card-box-subtitle">Okutulmuş ancak henüz bir kullanıcıya bağlanmamış kartlar</div>
+            </div>
+          </div>
+          <div id="pendingContainer">
+            <div class="skeleton-row"><div class="skeleton"></div></div>
+            <div class="skeleton-row"><div class="skeleton"></div></div>
+          </div>
         </section>
 
         <section class="card-box">
-          <div class="card-header"><div class="card-title-group"><span class="card-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span><div><h3>Kart İstekleri ve Tanımlı Kullanıcılar</h3><small>Yeni okutulan kartları aynı tablodan onaylayın veya reddedin</small></div></div><span class="badge badge-warning" id="auth-pending-count">0 bekleyen istek</span></div>
-          <div id="authorization-message" class="form-message table-message" role="status" aria-live="polite" hidden></div>
-          <div class="table-toolbar">
-            <div class="filter-row">
-              <div class="filter-field">
-                <label for="authorized-user-filter">Kullanıcı veya rol</label>
-                <div class="filter-input-wrap">
-                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
-                  <input id="authorized-user-filter" type="search" class="date-search-bar" data-table-filter="authorized-users-table" data-count-target="authorized-users-count" data-filter-mode="text" data-count-label="kayıt" data-empty-message="Aramanızla eşleşen kart veya kullanıcı bulunamadı." placeholder="Kullanıcı, durum veya kart UID ara" aria-controls="authorized-users-table">
-                </div>
-              </div>
-              <button type="button" class="btn-secondary filter-clear-btn" data-filter-clear="authorized-user-filter" aria-controls="authorized-users-table" disabled>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                Temizle
-              </button>
+          <div class="card-box-header">
+            <div>
+              <div class="card-box-title">Son Okutulan Kart</div>
+              <div class="card-box-subtitle">Canlı olarak güncellenir</div>
             </div>
-            <div class="filter-meta"><span class="badge badge-neutral" id="authorized-users-count" aria-live="polite">0 kullanıcı</span></div>
+            <span class="live-indicator"><span class="live-indicator-dot"></span>Canlı</span>
           </div>
-          <div class="table-wrap"><table id="authorized-users-table"><thead><tr><th>Kullanıcı / Atama</th><th>Rol / Tür</th><th>RFID Kart UID</th><th>İstek Zamanı / Şifre</th><th>Erişim Yetkisi</th><th>İşlem</th></tr></thead><tbody id="authorization-table-body">
-          </tbody></table></div>
-          <div class="card-footer"><span class="cell-secondary">Yeni kart isteğinde kullanıcıyı seçip “Yetki Ver” veya “Reddet” düğmesini kullanın.</span></div>
+          <div id="lastScanContainer">
+            <div class="state-box"><span class="spinner spinner-lg"></span><div class="state-box-text">Bekleniyor…</div></div>
+          </div>
         </section>
       </div>
+
+      <section class="card-box" data-role="admin">
+        <div class="card-box-header">
+          <div>
+            <div class="card-box-title">Kart Yetkilendirmeleri</div>
+            <div class="card-box-subtitle">Kullanıcılara tanımlı kart yetkileri; duruma tıklayarak aktif/pasif değiştirebilirsiniz</div>
+          </div>
+        </div>
+        <div id="permissionsContainer">
+          <div class="skeleton-row"><div class="skeleton"></div></div>
+          <div class="skeleton-row"><div class="skeleton"></div></div>
+          <div class="skeleton-row"><div class="skeleton"></div></div>
+        </div>
+      </section>
     </main>
   </div>
+</div>
+
+<script src="assets/js/api.js?v=20260811-1" defer></script>
+<script src="assets/js/theme.js?v=20260811-1" defer></script>
+<script src="assets/js/nav.js?v=20260811-1" defer></script>
+<script src="assets/js/ui.js?v=20260811-1" defer></script>
+<script src="assets/js/yetkilendirme.js?v=20260811-1" defer></script>
 </body>
 </html>

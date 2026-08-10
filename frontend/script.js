@@ -320,6 +320,76 @@ function createBadge(text, variant = 'neutral') {
     return createElement('span', `badge badge-${variant}`, text);
 }
 
+const THEME_STORAGE_KEY = 'securelab-theme';
+
+function getStoredTheme() {
+    try {
+        return localStorage.getItem(THEME_STORAGE_KEY);
+    } catch (error) {
+        return null;
+    }
+}
+
+function getPreferredTheme() {
+    const stored = getStoredTheme();
+    if (stored === 'dark' || stored === 'light') return stored;
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    return prefersDark ? 'dark' : 'light';
+}
+
+function updateThemeToggleButtons(theme) {
+    document.querySelectorAll('.theme-toggle').forEach((button) => {
+        button.setAttribute('aria-pressed', String(theme === 'dark'));
+        button.setAttribute('aria-label', theme === 'dark' ? 'Aydınlık moda geç' : 'Karanlık moda geç');
+    });
+}
+
+function setTheme(theme) {
+    const resolved = theme === 'dark' ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', resolved);
+    try {
+        localStorage.setItem(THEME_STORAGE_KEY, resolved);
+    } catch (error) {
+        /* localStorage kullanılamıyorsa tema yalnızca bu oturum için geçerli olur. */
+    }
+    updateThemeToggleButtons(resolved);
+}
+
+function initTheme() {
+    setTheme(getPreferredTheme());
+}
+
+function createThemeToggleButton() {
+    const button = createElement('button', 'theme-toggle');
+    button.type = 'button';
+    button.innerHTML = '<svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>';
+    button.addEventListener('click', () => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        setTheme(isDark ? 'light' : 'dark');
+    });
+    return button;
+}
+
+function initThemeToggle() {
+    if (document.querySelector('.theme-toggle')) {
+        updateThemeToggleButtons(document.documentElement.getAttribute('data-theme'));
+        return;
+    }
+    const topbar = document.querySelector('.topbar');
+    const button = createThemeToggleButton();
+    if (topbar) {
+        const profile = topbar.querySelector('.topbar-profile');
+        const systemPill = topbar.querySelector('.system-pill');
+        if (profile) topbar.insertBefore(button, profile);
+        else if (systemPill) topbar.insertBefore(button, systemPill.nextSibling);
+        else topbar.appendChild(button);
+    } else {
+        button.classList.add('theme-toggle-floating');
+        document.body.appendChild(button);
+    }
+    updateThemeToggleButtons(document.documentElement.getAttribute('data-theme'));
+}
+
 function setText(id, value) {
     const element = document.getElementById(id);
     if (!element) return;
@@ -1154,7 +1224,9 @@ function normalizeNavigation() {
         menuToggle.classList.remove('floating-menu-toggle');
         topbar.prepend(menuToggle);
         if (!topbar.querySelector('.topbar-profile')) {
-            const profile = createElement('div', 'topbar-profile');
+            const profile = createElement('a', 'topbar-profile');
+            profile.href = 'hesabim.html';
+            profile.setAttribute('aria-label', 'Hesabım sayfasına git');
             profile.append(
                 createElement('span', 'topbar-profile-avatar', 'SL'),
                 (() => {
@@ -1202,7 +1274,12 @@ function initNavigation() {
     menuToggle.addEventListener('click', () => {
         setMenuState(!document.body.classList.contains('menu-open'));
     });
-    closeButton?.addEventListener('click', () => {
+    closeButton?.addEventListener('click', (event) => {
+        // .sidebar-close-button artık tıklanabilir .brand bağlantısının
+        // içinde yer alıyor; tıklamanın ana sayfaya yönlendirmeyi de
+        // tetiklemesini önlemek için olayın yukarı yayılmasını durduruyoruz.
+        event.preventDefault();
+        event.stopPropagation();
         setMenuState(false);
         menuToggle.focus();
     });
@@ -2726,8 +2803,10 @@ function readFileAsDataUrl(file) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+    initTheme();
     normalizeNavigation();
     initNavigation();
+    initThemeToggle();
     initTableFilters();
     initLogout();
 

@@ -1,98 +1,90 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arıza Bildir | SecureLab</title>
-  <link rel="stylesheet" href="style.css?v=20260807-4">
-  <script src="ariza-bildir.js?v=20260807-4" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arıza Bildir · SecureLab</title>
+<script>(function(){try{var t=localStorage.getItem('securelab-theme');if(t!=='dark'&&t!=='light'){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/css/tokens.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/base.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/standalone.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/components.css?v=20260811-1">
 </head>
-<body data-page="issue-report">
-  <main class="standalone-page">
-    <div class="standalone-brand">
-      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span>
-      <div><strong>SecureLab</strong><small>Öğrenci Arıza Bildirim Formu</small></div>
+<body class="standalone-body" data-page="ariza-bildir">
+<div class="solo-shell">
+  <div class="solo-header">
+    <div class="solo-brand">
+      <span class="solo-brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 9.5-4-1.2-7-5-7-9.5V6l7-3Z"></path><path d="M9.5 12l1.8 1.8L14.7 10"></path></svg>
+      </span>
+      <span>SecureLab</span>
+    </div>
+  </div>
+
+  <div class="solo-card">
+    <div class="solo-card-header">
+      <h1 class="solo-card-title">Arıza Bildir</h1>
+      <p class="solo-card-subtitle">Kapı, kart okuyucu veya oda içi ekipmanlarla ilgili bir sorunu buradan bildirebilirsiniz. Bildiriminiz ilgili birime iletilecektir.</p>
     </div>
 
-    <div class="mobile-card">
-      <article class="card-box">
-        <header class="ticket-header">
-          <span class="ticket-header-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.7 6.3a4 4 0 0 0-5-5L7 4l3 3 2.7-2.7a4 4 0 0 0 2 2Z"/><path d="m5 8-3 3 10 10 3-3M14 16l6-6 2 2-6 6"/></svg></span>
-          <div class="eyebrow">QR teknik destek</div>
-          <h1 class="page-title">Arıza Bildir</h1>
-          <p class="page-description">Kapı veya erişim ekipmanında gördüğünüz sorunu teknik ekibe iletin. Bu form için giriş yapmanız gerekmez.</p>
-        </header>
+    <div id="formAlert" role="alert"></div>
 
-        <form class="ticket-form" id="issue-report-form">
-          <div class="form-grid">
-            <div class="form-group">
-              <label class="form-label" for="report-full-name">Ad Soyad</label>
-              <input id="report-full-name" type="text" class="form-control" maxlength="80" placeholder="Adınız ve soyadınız" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" for="report-email">E-posta Adresi</label>
-              <div class="email-input-group">
-                <input id="report-email" type="text" maxlength="40" placeholder="kullanici.adi" required>
-                <span class="email-domain">@subu.edu.tr</span>
-              </div>
-            </div>
+    <form class="stack" id="arizaForm" novalidate>
+      <div class="form-row">
+        <div class="field">
+          <label class="field-label" for="adSoyad">Ad Soyad <span class="optional">(zorunlu)</span></label>
+          <input class="form-control" type="text" id="adSoyad" name="adSoyad" placeholder="Adınız Soyadınız" autocomplete="name" required>
+          <span class="field-error">Lütfen ad soyad girin.</span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="epostaLocal">E-posta <span class="optional">(zorunlu)</span></label>
+          <div class="input-group">
+            <input class="form-control" type="text" id="epostaLocal" name="epostaLocal" placeholder="kullaniciadi" autocomplete="off" inputmode="email" required>
           </div>
+          <span class="field-hint">@subu.edu.tr uzantısı otomatik eklenir.</span>
+          <span class="field-error">Lütfen geçerli bir e-posta kullanıcı adı girin.</span>
+        </div>
+      </div>
 
-          <div class="form-group">
-            <label class="form-label" for="report-issue-type">Arıza Türü</label>
-            <select id="report-issue-type" name="issueType" class="form-control" required>
-              <option value="">Arıza türü seçin</option>
-              <option value="Kapı">Kapı</option>
-              <option value="RFID okuyucu">RFID okuyucu</option>
-              <option value="Tuş takımı">Tuş takımı</option>
-              <option value="Monitör">Monitör</option>
-              <option value="Bilgisayar kasası">Bilgisayar kasası</option>
-              <option value="Klavye">Klavye</option>
-              <option value="Fare">Fare</option>
-              <option value="Kablo, adaptör veya priz">Kablo, adaptör veya priz</option>
-              <option value="Ağ veya internet">Ağ veya internet</option>
-              <option value="Yazıcı veya projeksiyon">Yazıcı veya projeksiyon</option>
-              <option value="Masa veya sandalye">Masa veya sandalye</option>
-              <option value="Diğer">Diğer</option>
-            </select>
-          </div>
+      <div class="field">
+        <label class="field-label" for="issueType">Arıza türü <span class="optional">(zorunlu)</span></label>
+        <select class="form-control" id="issueType" name="issueType" required>
+          <option value="" disabled selected>Bir tür seçin</option>
+        </select>
+        <span class="field-error">Lütfen bir arıza türü seçin.</span>
+      </div>
 
-          <div class="form-group">
-            <label class="form-label">Arıza Fotoğrafı Yükle / Çek</label>
-            <input type="file" id="filePicker" accept="image/*" hidden>
-            <input type="file" id="cameraInput" accept="image/*" capture="environment" hidden>
-            <div class="file-input-box">
-              <label for="filePicker" class="file-text" id="fileNameText">Dosya seçmek için tıklayın</label>
-              <label for="cameraInput" class="camera-btn" title="Kamerayı aç" aria-label="Kamerayı aç">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.5 4 16 7h4a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h4l1.5-3h5Z"/><circle cx="12" cy="13" r="3"/></svg>
-              </label>
-            </div>
-          </div>
+      <div class="field">
+        <label class="field-label" for="photoInput">Fotoğraf <span class="optional">(zorunlu)</span></label>
+        <input class="form-control" type="file" id="photoInput" name="photoInput" accept="image/png,image/jpeg,image/webp,image/gif" capture="environment" required>
+        <span class="field-hint">En fazla 2,5 MB boyutunda bir fotoğraf ekleyin.</span>
+        <span class="field-error">Lütfen bir fotoğraf seçin.</span>
+        <div class="photo-preview" id="photoPreview">
+          <span class="photo-preview-empty">Henüz fotoğraf seçilmedi.</span>
+        </div>
+      </div>
 
-          <div class="form-group">
-            <label class="form-label" for="report-description">Açıklama</label>
-            <textarea id="report-description" name="description" class="form-control" rows="4" maxlength="512" placeholder="Sorunun nerede ve nasıl oluştuğunu açıklayın..." required></textarea>
-          </div>
+      <div class="field">
+        <label class="field-label" for="description">Açıklama</label>
+        <textarea class="form-control" id="description" name="description" rows="4" minlength="5" maxlength="512" placeholder="Sorunu kısaca açıklayın (en az 5 karakter)." required></textarea>
+        <span class="field-hint"><span id="descCount">0</span>/512 karakter</span>
+        <span class="field-error">Açıklama 5 ile 512 karakter arasında olmalıdır.</span>
+      </div>
 
-          <div class="security-note">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-            <span>Gönderdiğiniz bilgiler yalnızca teknik inceleme amacıyla kullanılacaktır.</span>
-          </div>
+      <button type="submit" class="btn btn-primary btn-lg btn-block" id="submitBtn">
+        <span id="submitBtnText">Bildirimi Gönder</span>
+      </button>
+    </form>
 
-          <div id="issue-report-message" class="form-message form-message-info" role="status" aria-live="polite">
-            Formu doldurduktan sonra bildiriminiz doğrudan teknik ekibe gönderilir.
-          </div>
+    <div id="successState" hidden></div>
+  </div>
 
-          <button type="submit" class="btn-primary" id="issue-report-submit">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-            Bildirimi Gönder
-          </button>
-        </form>
-      </article>
-    </div>
+  <div class="solo-footer">SecureLab Kurumsal Erişim Kontrol Sistemi</div>
+</div>
 
-    <p class="standalone-footer">SecureLab Teknik Destek</p>
-  </main>
-
+<script src="assets/js/api.js?v=20260811-1" defer></script>
+<script src="assets/js/theme.js?v=20260811-1" defer></script>
+<script src="assets/js/ui.js?v=20260811-1" defer></script>
+<script src="assets/js/ariza-bildir.js?v=20260811-1" defer></script>
 </body>
 </html>

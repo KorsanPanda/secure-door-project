@@ -265,6 +265,9 @@ class MqttService {
           dogrulamaYontemi: payload.dogrulama_yontemi === 'pin' ? 'pin' : 'kart',
           sonuc: decision.allowed ? 'izin' : 'red',
           redNedeni: decision.allowed ? null : (decision.reason || 'yetkisiz'),
+          // Sadece çevrimiçi PIN doğrulamasında dolu gelir (bkz. accessDecisionService.verifyPin);
+          // kart girişlerinde veya offline/HMAC tabanlı doğrulamada null kalır.
+          kapiSifreId: decision.kapiSifreId || null,
           olayTamani: eventTime
         }
       })

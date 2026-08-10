@@ -171,6 +171,8 @@ model KapiSifreGecmisi {
   olusturulma      DateTime   @default(now()) @db.Timestamptz()
   gecerlilikBitis  DateTime?  @db.Timestamptz()
 
+  erisimKayitlari  ErisimKaydi[]
+
   @@index([kullaniciId, aktif])
   @@index([kullaniciId, olusturulma])
   @@map("kapi_sifre_gecmisi")
@@ -342,9 +344,15 @@ model ErisimKaydi {
   sonuc           ErisimSonucu
   redNedeni       String?   @db.VarChar(32) // 'yetkilendirilmemis', 'iptal', vb.
 
+  // PIN ile doğrulanan erişimlerde, kullanılan PIN'in kapi_sifre_gecmisi kaydına referans.
+  // Kart ile girişlerde veya PIN eşleşmediğinde null kalır.
+  kapiSifreId     BigInt?
+  kapiSifre       KapiSifreGecmisi? @relation(fields: [kapiSifreId], references: [kapiSifreId], onDelete: SetNull)
+
   olayTamani      DateTime  @db.Timestamptz()
   kayitTamani     DateTime  @default(now()) @db.Timestamptz()
 
+  @@index([kapiSifreId])
   @@id([kayitId, olayTamani])
   @@map("erisim_kaydi")
 }

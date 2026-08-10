@@ -175,12 +175,26 @@ async function verifyPin({ cihazId, kapiId, pin }) {
     : false;
   const allowed = Boolean(matchedUser && doorAllowed);
 
+  // Girilen PIN, kullanıcının o an aktif olan kapi_sifre_gecmisi kaydıyla eşleşir
+  // (ikisi de aynı transaction'da birlikte güncellenir). Erişim kaydına bu PIN'in
+  // hangi geçmiş kaydına ait olduğunu yazabilmek için burada buluyoruz.
+  let kapiSifreId = null;
+  if (matchedUser) {
+    const activePinRecord = await prisma.kapiSifreGecmisi.findFirst({
+      where: { kullaniciId: matchedUser.kullaniciId, aktif: true },
+      orderBy: { olusturulma: 'desc' },
+      select: { kapiSifreId: true }
+    });
+    kapiSifreId = activePinRecord?.kapiSifreId || null;
+  }
+
   return {
     allowed,
     reason: allowed ? null : matchedUser ? 'kapi_yetkisi_yok' : 'gecersiz_pin',
     userId: matchedUser?.kullaniciId || null,
     card: null,
-    door: kapi
+    door: kapi,
+    kapiSifreId
   };
 }
 

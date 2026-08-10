@@ -1,166 +1,162 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ana Sayfa | SecureLab</title>
-  <link rel="stylesheet" href="style.css?v=20260807-4">
-  <script src="auth-guard.js?v=20260807-4"></script>
-  <script src="script.js?v=20260807-4" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel · SecureLab</title>
+<script>(function(){try{var t=localStorage.getItem('securelab-theme');if(t!=='dark'&&t!=='light'){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/css/tokens.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/base.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/layout.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/components.css?v=20260811-1">
 </head>
-<body data-page="dashboard" data-auth-required="true">
-  <div class="app-shell">
-    <nav class="navbar" id="main-navigation" aria-label="Ana navigasyon">
-      <div class="brand">
-        <span class="brand-mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg>
+<body data-page="dashboard" data-breadcrumb="Genel Bakış">
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <a href="index.html" class="sidebar-brand-link">
+        <span class="sidebar-brand-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 9.5-4-1.2-7-5-7-9.5V6l7-3Z"></path><path d="M9.5 12l1.8 1.8L14.7 10"></path></svg>
         </span>
-        <div class="brand-copy"><div class="logo">SecureLab</div><small>Erişim Yönetim Platformu</small></div>
-      </div>
-
-      <div class="nav-section-label">Yönetim</div>
-      <div class="nav-links">
-        <a class="active" href="index.html" aria-current="page">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-          <span>Ana Sayfa</span>
-        </a>
-        <a href="gecici-sifre.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m12 11 8-8M15 6l3 3M17 4l3 3"/></svg>
-          <span>Geçici Şifre</span>
-        </a>
-        <a href="gecmis-girisler.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>
-          <span>Giriş Geçmişi</span>
-        </a>
-        <a href="yetkilendirme.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="m16 11 2 2 4-4"/></svg>
-          <span>Yetkilendirme</span>
-        </a>
-        <a href="ariza-gecmisi.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.7 6.3a4 4 0 0 0-5-5L7 4l3 3 2.7-2.7a4 4 0 0 0 2 2Z"/><path d="m5 8-3 3 10 10 3-3M14 16l6-6 2 2-6 6"/></svg>
-          <span>Arıza Geçmişi</span>
-        </a>
-        <a class="logout-link" href="login.html">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-          <span>Çıkış Yap</span>
-        </a>
-      </div>
-
-      <div class="sidebar-meta">
-        <div class="sidebar-meta-row"><span class="sidebar-avatar">SL</span><div><strong>Sistem Yönetimi</strong><small>Güvenli oturum</small></div></div>
-      </div>
+        <span class="sidebar-brand-text">SecureLab</span>
+      </a>
+    </div>
+    <nav class="sidebar-nav" aria-label="Ana menü">
+      <a href="index.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg>
+        <span>Panel</span>
+      </a>
+      <a href="admin.html" class="sidebar-link" data-role="admin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-1.5a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4V20"></path><circle cx="10" cy="7.5" r="3.5"></circle><path d="M19.5 20v-1.2a3.3 3.3 0 0 0-2.3-3.15"></path><path d="M15.3 4.2a3.5 3.5 0 0 1 0 6.6"></path></svg>
+        <span>Kullanıcılar</span>
+      </a>
+      <a href="yetkilendirme.html" class="sidebar-link" data-role="admin">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15.5" r="4"></circle><path d="M11 12.5 18.5 5M16.5 7 19 9.5M13.7 9.8l2 2"></path></svg>
+        <span>Yetkilendirme</span>
+      </a>
+      <a href="gecmis-girisler.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2.5"></path><path d="M9 2.5h6"></path></svg>
+        <span>Erişim Geçmişi</span>
+      </a>
+      <a href="ariza-gecmisi.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 1-5.4 5.3L4 17v3h3l5.4-5.3a4 4 0 0 1 5.3-5.4l-2.6 2.6-2-2 2.6-2.6Z"></path></svg>
+        <span>Arıza Geçmişi</span>
+      </a>
+      <a href="qr-kod.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="6" height="6" rx="1"></rect><rect x="14.5" y="3.5" width="6" height="6" rx="1"></rect><rect x="3.5" y="14.5" width="6" height="6" rx="1"></rect><path d="M14.5 14.5h3v3M20.5 14.5v2M14.5 20.5h3M20.5 20.5v-1"></path></svg>
+        <span>QR Kod</span>
+      </a>
+      <a href="gecici-sifre.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15.5" r="4"></circle><path d="M11 12.5 19 4.5M16.3 7.2l2.3 2.3M19 4.5l1.6 1.6"></path></svg>
+        <span>Geçici Şifre</span>
+      </a>
+      <a href="hesabim.html" class="sidebar-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8.5" r="3.5"></circle><path d="M5 20a7 7 0 0 1 14 0"></path></svg>
+        <span>Hesabım</span>
+      </a>
     </nav>
-    <div class="menu-backdrop" aria-hidden="true"></div>
+    <div class="sidebar-footer">SecureLab Erişim Kontrol Paneli</div>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
-    <main class="main-panel">
-      <button type="button" class="menu-toggle floating-menu-toggle" aria-expanded="false" aria-controls="main-navigation" aria-label="Menüyü aç">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  <div class="app-body">
+    <header class="topbar">
+      <button type="button" class="topbar-menu-btn" id="menuToggle" aria-label="Menüyü aç" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
       </button>
-
-      <header class="topbar">
-        <div class="topbar-context">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="18" height="18" x="3" y="3" rx="3"/><path d="M8 12h8M12 8v8"/></svg>
-          <span>Kontrol Merkezi / Genel Bakış</span>
-        </div>
-        <span class="system-pill" id="dashboard-system-state">Sistem durumu yükleniyor</span>
-      </header>
-
-      <div class="container">
-        <section class="page-header">
-          <div>
-            <div class="eyebrow">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18M7 16l4-4 3 3 5-7"/></svg>
-              Canlı sistem görünümü
-            </div>
-            <h1 class="page-title">Sistem Genel Durumu</h1>
-            <p class="page-subtitle page-description">Laboratuvar erişim altyapısını, kullanıcı hareketlerini ve güvenlik durumunu tek ekrandan izleyin.</p>
-          </div>
-          <div class="header-actions page-actions">
-            <a class="btn-primary" href="gecici-sifre.html">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m12 11 8-8M15 6l3 3"/></svg>
-              Geçici Şifre Oluştur
-            </a>
-          </div>
-        </section>
-
-        <section class="metrics-grid" aria-label="Sistem özeti">
-          <article class="metric-card">
-            <div class="metric-top"><span class="metric-icon success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="14" height="16" x="5" y="4" rx="2"/><path d="M9 12h6M15 12v4"/></svg></span><span class="badge badge-success">Kapılar</span></div>
-            <div class="metric-label">Kapı Durumu</div><div class="metric-value" id="dashboard-door-value">—</div><div class="metric-detail" id="dashboard-door-detail">Veriler yükleniyor</div>
-          </article>
-          <article class="metric-card">
-            <div class="metric-top"><span class="metric-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M16 11h6"/></svg></span><span class="badge badge-info">Kullanıcılar</span></div>
-            <div class="metric-label">Yetkili Kullanıcı</div><div class="metric-value" id="dashboard-user-value">—</div><div class="metric-detail" id="dashboard-user-detail">Veriler yükleniyor</div>
-          </article>
-          <article class="metric-card">
-            <div class="metric-top"><span class="metric-icon info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></span><span class="badge badge-info">Erişim</span></div>
-            <div class="metric-label">Başarılı Giriş</div><div class="metric-value" id="dashboard-success-value">—</div><div class="metric-detail">Görüntülenen son kayıtlar</div>
-          </article>
-          <article class="metric-card">
-            <div class="metric-top"><span class="metric-icon warning"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.6 2.6 17A2 2 0 0 0 4.3 20h15.4a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/></svg></span><span class="badge badge-warning">Kontrol</span></div>
-            <div class="metric-label">Başarısız Deneme</div><div class="metric-value" id="dashboard-denied-value">—</div><div class="metric-detail">Görüntülenen son kayıtlar</div>
-          </article>
-        </section>
-
-        <section class="grid-2">
-          <article class="card-box">
-            <div class="card-header">
-              <div class="card-title-group"><span class="card-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="14" height="16" x="5" y="4" rx="2"/><path d="M9 12h6M15 12v4"/></svg></span><div><h3>Laboratuvar Kapısı</h3><small>Anlık bağlantı ve güvenlik bilgileri</small></div></div>
-              <span class="badge badge-neutral" id="dashboard-infra-state">Durum yükleniyor</span>
-            </div>
-            <div class="card-body">
-              <div class="status-list">
-                <div class="status-row"><span class="status-label">Kapı durumu</span><span class="status-value" id="dashboard-door-state">Yükleniyor</span></div>
-                <div class="status-row"><span class="status-label">Kart okuyucu</span><span class="status-value" id="dashboard-device-state">Yükleniyor</span></div>
-                <div class="status-row"><span class="status-label">Son bağlantı</span><span class="status-value" id="dashboard-heartbeat">Yükleniyor</span></div>
-              </div>
-            </div>
-          </article>
-
-          <article class="card-box">
-            <div class="card-header">
-              <div class="card-title-group"><span class="card-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></span><div><h3>Hızlı İşlemler</h3><small>Sık kullanılan yönetim araçları</small></div></div>
-            </div>
-            <div class="card-body dashboard-actions">
-              <a class="btn-secondary" href="gecici-sifre.html">Geçici Şifre</a>
-              <a class="btn-secondary" href="yetkilendirme.html">Yetkilendirme</a>
-              <a class="btn-secondary" href="ariza-gecmisi.html">Arıza Geçmişi</a>
-              <a class="btn-secondary" href="gecmis-girisler.html">Giriş Geçmişi</a>
-            </div>
-          </article>
-        </section>
-
-        <section class="card-box">
-          <div class="card-header">
-            <div class="card-title-group"><span class="card-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg></span><div><h3>Son Kapı Giriş Kayıtları</h3><small>En son erişim hareketleri</small></div></div>
-            <a class="section-link" href="gecmis-girisler.html">Tüm kayıtlar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m9 18 6-6-6-6"/></svg></a>
-          </div>
-          <div class="table-toolbar">
-            <div class="filter-row">
-              <div class="filter-field">
-                <label for="dashboard-date-filter">Kayıt tarihi</label>
-                <div class="filter-input-wrap">
-                  <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 2v4M16 2v4M3 10h18"/><rect width="18" height="18" x="3" y="4" rx="2"/></svg>
-                  <input id="dashboard-date-filter" type="text" list="dashboard-date-suggestions" class="date-search-bar" data-table-filter="dashboard-access-table" data-count-target="dashboard-access-count" aria-label="Tarih filtresi" aria-controls="dashboard-access-table">
-                  <datalist id="dashboard-date-suggestions"></datalist>
-                </div>
-              </div>
-              <button type="button" class="btn-secondary filter-clear-btn" data-filter-clear="dashboard-date-filter" aria-controls="dashboard-access-table" disabled>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M18 6 6 18M6 6l12 12"/></svg>
-                Temizle
-              </button>
-            </div>
-            <div class="filter-meta"><span class="badge badge-neutral" id="dashboard-access-count" aria-live="polite">0 kayıt</span></div>
-          </div>
-          <div class="table-wrap">
-            <table id="dashboard-access-table">
-              <thead><tr><th>Tarih / Saat</th><th>Kullanıcı</th><th>Rol</th><th>Giriş Yöntemi</th><th>Kapı</th><th>Durum</th></tr></thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </section>
+      <nav class="topbar-breadcrumb" aria-label="Konum">
+        <a href="index.html">Ana Sayfa</a>
+        <span class="topbar-breadcrumb-sep">/</span>
+        <span class="topbar-breadcrumb-current" id="breadcrumbCurrent">Genel Bakış</span>
+      </nav>
+      <div class="topbar-actions" id="topbarActions">
+        <a href="hesabim.html" class="topbar-profile">
+          <span class="topbar-profile-avatar" id="profileAvatar">--</span>
+          <span class="topbar-profile-meta">
+            <span class="topbar-profile-name" id="profileName">Yükleniyor…</span>
+            <span class="badge badge-neutral" id="profileRoleBadge">—</span>
+          </span>
+        </a>
+        <button type="button" class="btn btn-ghost btn-sm" id="logoutBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h3"></path><path d="M16 16l4-4-4-4"></path><path d="M20 12H9"></path></svg>
+          <span>Çıkış Yap</span>
+        </button>
       </div>
+    </header>
+
+    <main class="main-content">
+      <div class="page-header">
+        <div class="page-header-text">
+          <h1 class="page-title">Genel Bakış</h1>
+          <p class="page-description">Sistem durumuna ve son erişim hareketlerine hızlı bir bakış.</p>
+        </div>
+      </div>
+
+      <section class="stat-grid" id="statGrid">
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-card-label">Toplam Kullanıcı</span>
+            <span class="stat-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-1.5a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4V20"></path><circle cx="10" cy="7.5" r="3.5"></circle></svg>
+            </span>
+          </div>
+          <div class="stat-card-value" id="statUsersTotal">—</div>
+          <div class="stat-card-meta" id="statUsersActive">Aktif kullanıcı sayısı yükleniyor…</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-card-label">Kapılar</span>
+            <span class="stat-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="1.5"></rect><path d="M14.5 12h.01"></path></svg>
+            </span>
+          </div>
+          <div class="stat-card-value" id="statDoorsTotal">—</div>
+          <div class="stat-card-meta" id="statDoorsActive">Aktif kapı sayısı yükleniyor…</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-card-label">Cihazlar</span>
+            <span class="stat-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="11" rx="1.5"></rect><path d="M9 20h6M12 15v5"></path></svg>
+            </span>
+          </div>
+          <div class="stat-card-value" id="statDevicesTotal">—</div>
+          <div class="stat-card-meta" id="statDevicesOnline">Çevrimiçi cihaz sayısı yükleniyor…</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <span class="stat-card-label">Son 20 Erişim</span>
+            <span class="stat-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2.5"></path></svg>
+            </span>
+          </div>
+          <div class="stat-card-value" id="statAccessGranted">—</div>
+          <div class="stat-card-meta" id="statAccessDenied">İzin verilen / reddedilen erişim yükleniyor…</div>
+        </div>
+      </section>
+
+      <section class="card-box">
+        <div class="card-box-header">
+          <div>
+            <div class="card-box-title">Son Erişim Hareketleri</div>
+            <div class="card-box-subtitle">En son 20 erişim kaydı</div>
+          </div>
+          <a href="gecmis-girisler.html" class="btn btn-secondary btn-sm">Tüm Geçmişi Gör</a>
+        </div>
+        <div id="recentAccessContainer">
+          <div class="skeleton-row"><div class="skeleton"></div></div>
+          <div class="skeleton-row"><div class="skeleton"></div></div>
+          <div class="skeleton-row"><div class="skeleton"></div></div>
+        </div>
+      </section>
     </main>
   </div>
+</div>
+
+<script src="assets/js/api.js?v=20260811-1" defer></script>
+<script src="assets/js/theme.js?v=20260811-1" defer></script>
+<script src="assets/js/nav.js?v=20260811-1" defer></script>
+<script src="assets/js/ui.js?v=20260811-1" defer></script>
+<script src="assets/js/dashboard.js?v=20260811-1" defer></script>
 </body>
 </html>

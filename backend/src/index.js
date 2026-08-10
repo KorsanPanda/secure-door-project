@@ -1,3 +1,11 @@
+// NOT: Bu dosya daha önce .env dosyasını hiç yüklemiyordu (yalnızca
+// prisma.config.js kendi içinde dotenv çağırıyordu, ama o sadece Prisma CLI
+// komutları çalıştırılırken devreye giriyor, "node src/index.js" ile
+// başlatılan asıl uygulama sürecini etkilemiyordu). Bu satır olmadan .env
+// içindeki değerler (ör. MQTT_BROKER_HOST=localhost, MQTT_ENABLED) hiç
+// okunmuyor, kod sadece dosyadaki sabit varsayılanları kullanıyordu.
+require('dotenv').config();
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -134,7 +142,14 @@ app.use((err, req, res, next) => {
 
 // -------------------------------------------------------------
 if (require.main === module) {
-    mqttService.connect();
+    // MQTT_ENABLED=false (.env) devre dışı bırakır — ESP32/broker olmadan yerel
+    // geliştirme sırasında bağlantı deneme loglarını susturmak için. Varsayılan
+    // (değişken tanımlı değilse) her zaman aktif: gerçek dağıtımda davranış değişmez.
+    if (process.env.MQTT_ENABLED !== 'false') {
+        mqttService.connect();
+    } else {
+        console.log('[MQTT] MQTT_ENABLED=false — broker bağlantısı atlandı (yerel geliştirme modu).');
+    }
     initSifreCron();
     initIhlalCron();
 

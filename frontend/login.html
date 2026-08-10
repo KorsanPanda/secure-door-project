@@ -1,84 +1,120 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="login-redirect.js?v=20260807-4"></script>
-  <title>Giriş Yap | SecureLab</title>
-  <link rel="stylesheet" href="style.css?v=20260807-4">
-  <script src="script.js?v=20260807-4" defer></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Giriş Yap · SecureLab</title>
+<script>(function(){try{var t=localStorage.getItem('securelab-theme');if(t!=='dark'&&t!=='light'){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/css/tokens.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/base.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/standalone.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/components.css?v=20260811-1">
 </head>
-<body data-page="login">
-  <main class="login-page">
-    <section class="login-showcase" aria-labelledby="login-hero-title">
-      <div class="login-brand">
-        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span>
-        <div><strong>SecureLab</strong><span>Erişim Yönetim Platformu</span></div>
-      </div>
-
-      <div class="login-hero">
-        <div class="security-orbit" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="16" height="12" x="4" y="9" rx="2"/><path d="M8 9V6a4 4 0 0 1 8 0v3M12 13v3"/></svg></div>
-        <h1 id="login-hero-title">Laboratuvar erişimi, güvenle yönetilir.</h1>
-        <p>Kart, PIN ve kapı altyapısını tek merkezden izleyen kurumsal erişim kontrol platformu.</p>
-        <div class="login-features">
-          <span class="login-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m5 12 4 4L19 6"/></svg>Güvenli doğrulama</span>
-          <span class="login-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18M7 16l4-4 3 3 5-7"/></svg>Canlı sistem görünümü</span>
-          <span class="login-feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>Merkezi erişim kontrolü</span>
+<body class="standalone-body" data-page="login">
+<div class="auth-shell">
+  <section class="auth-hero">
+    <div class="auth-hero-brand">
+      <span class="auth-hero-brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 9.5-4-1.2-7-5-7-9.5V6l7-3Z"></path><path d="M9.5 12l1.8 1.8L14.7 10"></path></svg>
+      </span>
+      <span>SecureLab</span>
+    </div>
+    <div class="auth-hero-body">
+      <h1 class="auth-hero-title">Kapı erişim kontrolünüzü tek panelden yönetin</h1>
+      <p class="auth-hero-text">RFID kart ve PIN doğrulamalı kapı erişim sisteminizi; kullanıcı yönetimi, yetkilendirme, erişim geçmişi ve arıza takibiyle uçtan uca yönetin.</p>
+      <div class="auth-hero-features">
+        <div class="auth-hero-feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.3 2.3L16 9.8"></path></svg>
+          <span>Gerçek zamanlı kart onayı ve yetkilendirme</span>
+        </div>
+        <div class="auth-hero-feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.3 2.3L16 9.8"></path></svg>
+          <span>Ayrıntılı erişim geçmişi ve raporlama</span>
+        </div>
+        <div class="auth-hero-feature">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M8.5 12.5l2.3 2.3L16 9.8"></path></svg>
+          <span>Arıza bildirimi ve QR ile hızlı erişim</span>
         </div>
       </div>
+    </div>
+    <div class="auth-hero-footer">© 2026 SecureLab · Kurumsal Erişim Kontrol Sistemi</div>
+  </section>
 
-      <div class="login-showcase-footer">SecureLab güvenli erişim altyapısı</div>
-    </section>
+  <section class="auth-panel">
+    <div class="auth-theme-toggle" id="authThemeToggle"></div>
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <h2 class="auth-card-title">Giriş Yap</h2>
+        <p class="auth-card-subtitle">Hesabınıza erişmek için bilgilerinizi girin.</p>
+      </div>
 
-    <section class="login-form-panel">
-      <div class="login-card">
-        <div class="login-card-header">
-          <div class="eyebrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>Yetkili kullanıcı girişi</div>
-          <h2 class="page-title">Tekrar hoş geldiniz</h2>
-          <p class="page-description">Yönetim paneline erişmek için kimlik bilgilerinizi girin.</p>
+      <div id="loginAlert" role="alert"></div>
+
+      <form class="auth-form" id="loginForm" novalidate>
+        <div class="field">
+          <label class="field-label" for="eposta">E-posta adresi</label>
+          <input class="form-control" type="email" id="eposta" name="eposta" autocomplete="username" placeholder="ornek@subu.edu.tr" required>
+          <span class="field-error">Geçerli bir e-posta adresi giriniz.</span>
         </div>
 
-        <form id="login-form">
-          <div class="form-group">
-            <label for="login-identity">E-posta</label>
-            <div class="input-with-icon">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="7" r="4"/></svg>
-              <input id="login-identity" name="identity" type="email" class="form-control" placeholder="Örn: kullanici@subu.edu.tr" autocomplete="username" required>
-            </div>
+        <div class="field">
+          <label class="field-label" for="pin">Şifre</label>
+          <div class="input-group">
+            <input class="form-control" type="password" id="pin" name="pin" autocomplete="current-password" placeholder="Şifrenizi girin" required>
+            <button type="button" class="input-group-btn" id="togglePassword" aria-label="Şifreyi göster">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
           </div>
+          <span class="field-error">Şifrenizi giriniz.</span>
+        </div>
 
-          <div class="form-group">
-            <label for="login-password">Şifre</label>
-            <div class="input-with-icon password-input">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="16" height="12" x="4" y="9" rx="2"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg>
-              <input id="login-password" name="password" type="password" class="form-control" placeholder="••••••••" autocomplete="current-password" required>
-              <button type="button" class="password-toggle" id="password-toggle" aria-label="Şifreyi göster" aria-pressed="false">
-                <svg class="eye-open" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
-              </button>
-            </div>
-            <div class="forgot-pass">
-              <button type="button" class="forgot-link" id="forgot-password-button">Şifremi unuttum</button>
-            </div>
-          </div>
-
-          <label class="remember-option">
-            <input type="checkbox" id="login-remember" name="remember">
-            <span>Bu cihazda oturumu açık tut</span>
+        <div class="auth-form-footer-row">
+          <label class="checkbox-field">
+            <input type="checkbox" id="rememberMe" name="rememberMe" checked>
+            <span>Beni hatırla</span>
           </label>
+          <a href="#" id="forgotPasswordLink">Şifremi unuttum</a>
+        </div>
 
-          <div id="login-message" class="form-message" role="alert" aria-live="polite" hidden></div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block" id="loginSubmit">
+          <span id="loginSubmitText">Giriş Yap</span>
+        </button>
+      </form>
+    </div>
+  </section>
+</div>
 
-          <button type="submit" class="btn-login" id="login-submit">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
-            Giriş Yap
-          </button>
-        </form>
-        <div class="login-security">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="16" height="12" x="4" y="9" rx="2"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg>
-          Güvenli oturum bağlantısı
+<!-- Forgot password modal -->
+<div class="modal-backdrop" id="forgotModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="forgotModalTitle">
+    <div class="modal-header">
+      <div>
+        <div class="modal-title" id="forgotModalTitle">Şifrenizi mi unuttunuz?</div>
+        <div class="modal-subtitle">E-posta adresinizi girin, sıfırlama bağlantısını gönderelim.</div>
+      </div>
+      <button type="button" class="modal-close" data-modal-close aria-label="Kapat">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+      </button>
+    </div>
+    <form id="forgotForm">
+      <div class="modal-body">
+        <div id="forgotAlert" role="status"></div>
+        <div class="field">
+          <label class="field-label" for="forgotEposta">E-posta adresi</label>
+          <input class="form-control" type="email" id="forgotEposta" name="forgotEposta" placeholder="ornek@subu.edu.tr" required>
         </div>
       </div>
-    </section>
-  </main>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-modal-close>Vazgeç</button>
+        <button type="submit" class="btn btn-primary" id="forgotSubmit">Bağlantı Gönder</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="assets/js/api.js?v=20260811-1" defer></script>
+<script src="assets/js/theme.js?v=20260811-1" defer></script>
+<script src="assets/js/ui.js?v=20260811-1" defer></script>
+<script src="assets/js/login.js?v=20260811-1" defer></script>
 </body>
 </html>

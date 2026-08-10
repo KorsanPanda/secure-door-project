@@ -1,0 +1,80 @@
+/* SecureLab — design tokens */
+:root {
+  /* Brand / sidebar - always dark navy regardless of theme */
+  --sidebar-bg: #0f2135;
+  --sidebar-bg-elevated: #142c46;
+  --sidebar-active: #1b3a5c;
+  --sidebar-text: #aebfd6;
+  --sidebar-text-active: #ffffff;
+  --sidebar-border: rgba(255,255,255,0.08);
+
+  /* Light theme surface tokens */
+  --bg-page: #f3f5f9;
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #f8fafc;
+  --bg-hover: #eef2f8;
+  --bg-subtle: #eef1f6;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text-primary: #10192b;
+  --text-secondary: #4a5872;
+  --text-muted: #8593ab;
+
+  --primary: #1d4e89;
+  --primary-hover: #163e6d;
+  --primary-tint: #e7eff8;
+  --success: #157347;
+  --success-tint: #e3f5ea;
+  --warning: #9a6400;
+  --warning-tint: #fdf1dc;
+  --danger: #b3261e;
+  --danger-tint: #fbe7e6;
+  --info: #0d6b8f;
+  --info-tint: #e2f3f8;
+  --neutral-tint: #edf0f5;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 1px 2px rgba(16,25,43,0.06);
+  --shadow-md: 0 6px 16px rgba(16,25,43,0.08);
+  --shadow-lg: 0 16px 40px rgba(16,25,43,0.14);
+
+  --sidebar-width: 264px;
+  --topbar-height: 64px;
+  --transition-fast: 150ms ease;
+  --transition-base: 220ms ease;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+:root[data-theme="dark"] {
+  --bg-page: #0a111e;
+  --bg-surface: #111a2c;
+  --bg-surface-alt: #16213a;
+  --bg-hover: #1a2740;
+  --bg-subtle: #172038;
+  --border: #24334f;
+  --border-strong: #34486d;
+  --text-primary: #e7ecf5;
+  --text-secondary: #a4b1c9;
+  --text-muted: #6d7c99;
+
+  --primary: #4f86c6;
+  --primary-hover: #6ea0da;
+  --primary-tint: rgba(79,134,198,0.16);
+  --success: #3fb476;
+  --success-tint: rgba(63,180,118,0.16);
+  --warning: #d9a441;
+  --warning-tint: rgba(217,164,65,0.16);
+  --danger: #e2685f;
+  --danger-tint: rgba(226,104,95,0.16);
+  --info: #4bb2d6;
+  --info-tint: rgba(75,178,214,0.16);
+  --neutral-tint: rgba(164,177,201,0.12);
+
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md: 0 6px 16px rgba(0,0,0,0.35);
+  --shadow-lg: 0 16px 40px rgba(0,0,0,0.5);
+}

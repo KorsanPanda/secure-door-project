@@ -68,6 +68,35 @@ async function listPinHistory(kullaniciId, limit = 50) {
     orderBy: { olusturulma: 'desc' },
     take: Math.min(Math.max(Number(limit) || 50, 1), 100)
   });
+
+  // Bu PIN'lerin kapıyı açmak için gerçekten kullanılıp kullanılmadığını görmek için
+  // erisim_kaydi tablosundan (dogrulamaYontemi='pin' olan ve bu kapiSifreId'ye
+  // bağlanmış) kayıtları grupla. Yalnızca çevrimiçi PIN doğrulaması bu bağlantıyı
+  // oluşturur; offline/HMAC tabanlı erişimler bu istatistiğe dahil olmaz.
+  const kapiSifreIds = records.map((record) => record.kapiSifreId);
+  const usageByPinId = new Map();
+  if (kapiSifreIds.length) {
+    const usageRows = await prisma.erisimKaydi.findMany({
+      where: { kapiSifreId: { in: kapiSifreIds } },
+      select: { kapiSifreId: true, sonuc: true, olayTamani: true, kapi: { select: { ad: true } } },
+      orderBy: { olayTamani: 'desc' }
+    });
+    for (const row of usageRows) {
+      const key = row.kapiSifreId.toString();
+      if (!usageByPinId.has(key)) {
+        usageByPinId.set(key, { toplamDeneme: 0, basariliKullanim: 0, sonKullanim: null, sonKapi: null, sonSonuc: null });
+      }
+      const stats = usageByPinId.get(key);
+      stats.toplamDeneme += 1;
+      if (row.sonuc === 'izin') stats.basariliKullanim += 1;
+      if (!stats.sonKullanim) {
+        stats.sonKullanim = row.olayTamani;
+        stats.sonKapi = row.kapi?.ad || null;
+        stats.sonSonuc = row.sonuc;
+      }
+    }
+  }
+
   const now = Date.now();
   return records.map((record) => {
     const expired = Boolean(record.gecerlilikBitis && record.gecerlilikBitis.getTime() <= now);
@@ -80,6 +109,7 @@ async function listPinHistory(kullaniciId, limit = 50) {
         pin = null;
       }
     }
+    const usage = usageByPinId.get(record.kapiSifreId.toString()) || null;
     return {
       kapiSifreId: record.kapiSifreId.toString(),
       pin,
@@ -88,7 +118,14 @@ async function listPinHistory(kullaniciId, limit = 50) {
       aktif: isCurrent,
       durum: isCurrent ? 'Güncel' : (expired ? 'Süresi doldu' : 'Geçmiş'),
       olusturulma: record.olusturulma,
-      gecerlilikBitis: record.gecerlilikBitis
+      gecerlilikBitis: record.gecerlilikBitis,
+      kullanim: {
+        toplamDeneme: usage?.toplamDeneme || 0,
+        basariliKullanim: usage?.basariliKullanim || 0,
+        sonKullanim: usage?.sonKullanim || null,
+        sonKapi: usage?.sonKapi || null,
+        sonSonuc: usage?.sonSonuc || null
+      }
     };
   });
 }
