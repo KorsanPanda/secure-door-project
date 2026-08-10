@@ -70,6 +70,10 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD:-}
       SMTP_FROM: ${SMTP_FROM:-}
       MQTT_BROKER_URL: ${MQTT_BROKER_URL}
+      # Backend Docker icinden "mqtt" servis adini, ESP32 ise disaridan
+      # sunucunun 10.9.2.50 adresini kullanir; ikisi ayni broker'dir.
+      MQTT_BROKER_HOST: ${MQTT_BROKER_HOST:-mqtt}
+      MQTT_BROKER_PORT: ${MQTT_BROKER_PORT:-1883}
       MQTT_USERNAME: ${MQTT_USERNAME}
       MQTT_PASSWORD: ${MQTT_PASSWORD}
       FIRMWARE_PUBLIC_BASE_URL: ${FIRMWARE_PUBLIC_BASE_URL}
@@ -107,7 +111,9 @@ services:
     container_name: kapi-sistemi-frontend
 
     ports:
-      - "8080:80"
+      # Üniversite güvenlik duvarında web için açılması istenen standart HTTP
+      # portu. Farklı bir port gerekiyorsa FRONTEND_PORT ile değiştirilebilir.
+      - "${FRONTEND_PORT:-80}:80"
 
     restart: unless-stopped
 

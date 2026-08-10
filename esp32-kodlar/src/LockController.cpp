@@ -8,14 +8,14 @@ LockController::LockController(uint8_t relayPin)
       isCoolingDown(false) {}
 
 void LockController::begin() {
-    // Bu role karti HIGH seviyesinde tetikleniyor.
-    // Guvenli bekleme durumunda giris LOW tutulur; boylece kilit
-    // surekli enerji almaz.
+    // Role karti aktif-dusuk calisir. Open-drain cikis HIGH yazildiginda
+    // hat serbest/pasif, LOW yazildiginda GND'ye cekilmis/aktif olur.
+    // Mod degistirilmeden once HIGH yazarak acilista istemsiz tetiklemeyi onle.
+    digitalWrite(relayPin, HIGH);
     pinMode(relayPin, OUTPUT_OPEN_DRAIN);
-    digitalWrite(relayPin, LOW);
 
     Serial.printf(
-        "[KILIT] GPIO%d PASIF/LOW. Okunan lojik=%d.\n",
+        "[KILIT] GPIO%d PASIF/HIGH (hat serbest). Okunan lojik=%d.\n",
         relayPin,
         digitalRead(relayPin)
     );
@@ -26,12 +26,12 @@ bool LockController::unlockDoor() {
         return false;
     }
 
-    digitalWrite(relayPin, HIGH);
+    digitalWrite(relayPin, LOW);
     isUnlocked = true;
     unlockTimer = millis();
 
     Serial.printf(
-        "[KILIT] GPIO%d AKTIF/HIGH (hat serbest). Okunan lojik=%d; 2000 ms.\n",
+        "[KILIT] GPIO%d AKTIF/LOW (GND'ye cekildi). Okunan lojik=%d; 2000 ms.\n",
         relayPin,
         digitalRead(relayPin)
     );
@@ -42,13 +42,13 @@ void LockController::update() {
     const unsigned long now = millis();
 
     if (isUnlocked && now - unlockTimer >= UNLOCK_DURATION) {
-        digitalWrite(relayPin, LOW);
+        digitalWrite(relayPin, HIGH);
         isUnlocked = false;
         isCoolingDown = true;
         cooldownTimer = now;
 
         Serial.printf(
-            "[KILIT] GPIO%d PASIF/LOW. Tetikleme suresi=%lu ms.\n",
+            "[KILIT] GPIO%d PASIF/HIGH. Tetikleme suresi=%lu ms.\n",
             relayPin,
             now - unlockTimer
         );

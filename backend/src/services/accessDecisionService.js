@@ -64,18 +64,6 @@ async function userCanAccessDoor(kullaniciId, kapiId) {
 
 async function verifyCard({ cihazId, kapiId, kartUid }) {
   const normalizedUid = String(kartUid || '').trim().toUpperCase();
-  const kapi = await resolveDoor(cihazId, kapiId);
-
-  if (!kapi || kapi.durum !== 'aktif') {
-    return {
-      allowed: false,
-      reason: 'aktif_kapi_bulunamadi',
-      userId: null,
-      card: null,
-      door: kapi
-    };
-  }
-
   const card = normalizedUid
     ? await prisma.kart.findUnique({
         where: { kartUid: normalizedUid },
@@ -88,6 +76,27 @@ async function verifyCard({ cihazId, kapiId, kartUid }) {
         }
       })
     : null;
+
+  // Kapı/cihaz atamasında bir yapılandırma sorunu olsa bile bilinmeyen kartı
+  // onay kuyruğuna al. Önceki akış kapıyı daha önce kontrol ettiği için burada
+  // erken dönüyor ve okutulan kart web panelinde hiç görünmüyordu.
+  const isRejectedRequest = card?.durum === 'iptal'
+    && card?.iptalNedeni === 'Yetkilendirme isteği reddedildi';
+  if (normalizedUid && (!card || isRejectedRequest)) {
+    await cardApprovalService.handleUnknownCardScan(normalizedUid);
+  }
+
+  const kapi = await resolveDoor(cihazId, kapiId);
+  if (!kapi || kapi.durum !== 'aktif') {
+    return {
+      allowed: false,
+      reason: 'aktif_kapi_bulunamadi',
+      userId: null,
+      card,
+      door: kapi
+    };
+  }
+
   const authorization = card?.kartYetkilendirmeler?.[0] || null;
   const identityAllowed = Boolean(
     card?.durum === 'aktif'
@@ -105,12 +114,6 @@ async function verifyCard({ cihazId, kapiId, kartUid }) {
     else if (!authorization) reason = 'yetkilendirilmemis';
     else if (authorization.kullanici.durum !== 'aktif') reason = 'kullanici_aktif_degil';
     else reason = 'kapi_yetkisi_yok';
-  }
-
-  const isRejectedRequest = card?.durum === 'iptal'
-    && card?.iptalNedeni === 'Yetkilendirme isteği reddedildi';
-  if (normalizedUid && (!card || isRejectedRequest)) {
-    await cardApprovalService.handleUnknownCardScan(normalizedUid);
   }
 
   return {

@@ -8,6 +8,7 @@
   var currentUser = null;
   var activeUsersCache = null;
   var pollTimer = null;
+  var pendingRefreshInFlight = false;
   var POLL_INTERVAL = 2000;
 
   document.addEventListener('DOMContentLoaded', init);
@@ -50,7 +51,10 @@
 
   function startPolling() {
     if (pollTimer) return;
-    pollTimer = setInterval(fetchLastScan, POLL_INTERVAL);
+    pollTimer = setInterval(function () {
+      fetchLastScan();
+      loadPending(true);
+    }, POLL_INTERVAL);
   }
 
   function stopPolling() {
@@ -97,9 +101,15 @@
     return activeUsersCache;
   }
 
-  async function loadPending() {
+  async function loadPending(silent) {
     var container = document.getElementById('pendingContainer');
-    UI.setLoading(container, 'Onay bekleyen kartlar yükleniyor…');
+    if (!container || pendingRefreshInFlight) return;
+
+    // Yönetici kullanıcı seçerken tabloyu yeniden çizip seçimini kaybetme.
+    if (silent && container.contains(document.activeElement)) return;
+
+    pendingRefreshInFlight = true;
+    if (!silent) UI.setLoading(container, 'Onay bekleyen kartlar yükleniyor…');
 
     try {
       var users = await loadActiveUsersCache();
@@ -142,7 +152,9 @@
         btn.addEventListener('click', function () { rejectCard(btn.getAttribute('data-uid')); });
       });
     } catch (err) {
-      UI.setError(container, err.message, loadPending);
+      if (!silent) UI.setError(container, err.message, loadPending);
+    } finally {
+      pendingRefreshInFlight = false;
     }
   }
 
