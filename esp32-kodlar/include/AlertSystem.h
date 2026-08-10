@@ -43,7 +43,8 @@ public:
         uint8_t blueLedPin = 255,
         bool blueLedActiveHigh = true,
         uint8_t redLedPin = 255,
-        bool redLedActiveHigh = true
+        bool redLedActiveHigh = true,
+        uint8_t ledExpanderAddress = 0
     );
 
     /**
@@ -124,6 +125,9 @@ private:
     bool _ledActiveHigh;
     bool _blueLedActiveHigh;
     bool _redLedActiveHigh;
+    uint8_t _ledExpanderAddress;
+    uint8_t _ledExpanderState;
+    uint32_t _lastLedExpanderErrorAtMs;
 
     AlertPattern _activePattern;
 
@@ -164,6 +168,12 @@ private:
     void finishPattern();
     void setBlueLed(bool enabled);
     void setRedLed(bool enabled);
+    void writeLedOutput(
+        uint8_t pin,
+        bool enabled,
+        bool activeHigh
+    );
+    bool writeLedExpanderState();
 
     void writeOutput(
         uint8_t pin,

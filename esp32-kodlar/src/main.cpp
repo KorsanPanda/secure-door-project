@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <WiFi.h>
+#include <SPI.h>
 #include <esp_system.h>
 #include <sys/time.h>
 #include <time.h>
@@ -29,7 +29,7 @@ CardReader cardReader(RFID_SS_PIN, RFID_RST_PIN, RFID_SCK_PIN, RFID_MISO_PIN, RF
 MqttManager mqttManager(MQTT_BROKER_HOST, MQTT_BROKER_PORT);
 OtaUpdater otaUpdater(mqttManager);
 LockController lock(RELAY_PIN);
-NetworkManager network(WIFI_SSID, WIFI_IDENTITY, WIFI_USERNAME, WIFI_PASSWORD);
+NetworkManager network;
 AccessControl accessControl;
 // Kullandigimiz buzzer modulu LOW seviyesinde ses verir.
 AlertSystem alertSystem(
@@ -40,7 +40,8 @@ AlertSystem alertSystem(
     LED_BLUE_PIN,
     false,
     LED_RED_PIN,
-    false
+    false,
+    PCF8574_LED_ADDRESS
 );
 LcdDisplay lcdDisplay(I2C_SDA_PIN, I2C_SCL_PIN);
 RtcManager rtcManager(I2C_SDA_PIN, I2C_SCL_PIN);
@@ -77,6 +78,19 @@ static constexpr uint32_t DOOR_OPEN_ALARM_DELAY_MS = 20000;
 static Durum lastLcdWorkflowState = Durum::ALARM;
 static bool lastAccessFailureWasConnection = false;
 static bool rtcSyncedFromNtp = false;
+
+enum class ConnectivityLcdState : uint8_t {
+    UNKNOWN,
+    ETHERNET_DOWN,
+    MQTT_WAITING,
+    ONLINE
+};
+
+static ConnectivityLcdState connectivityLcdState = ConnectivityLcdState::UNKNOWN;
+static bool mqttWasConnected = false;
+static bool onlineAnnouncementActive = false;
+static uint32_t connectivityMessageAtMs = 0;
+static constexpr uint32_t ONLINE_LCD_MESSAGE_MS = 3000;
 
 // NTP zaman senkronize olduysa sistem saatini (mevcut davranis), degilse
 // -mumkunse- pilli RTC'den okunan zamani kullanir. RTC de yoksa yine
@@ -392,6 +406,62 @@ static void updateDoorOpenAlarm() {
     }
 }
 
+static ConnectivityLcdState currentConnectivityState() {
+    if (!network.isConnected()) return ConnectivityLcdState::ETHERNET_DOWN;
+    if (!mqttManager.isConnected()) return ConnectivityLcdState::MQTT_WAITING;
+    return ConnectivityLcdState::ONLINE;
+}
+
+static void showCurrentConnectivityMessage() {
+    switch (connectivityLcdState) {
+        case ConnectivityLcdState::ETHERNET_DOWN:
+            lcdDisplay.showEthernetDisconnected();
+            break;
+        case ConnectivityLcdState::MQTT_WAITING:
+            if (mqttWasConnected) lcdDisplay.showMqttDisconnected();
+            else lcdDisplay.showMqttWaiting();
+            break;
+        case ConnectivityLcdState::ONLINE:
+            lcdDisplay.showMqttConnected();
+            break;
+        case ConnectivityLcdState::UNKNOWN:
+            lcdDisplay.showEthernetConnecting();
+            break;
+    }
+}
+
+static void updateConnectivityLcdStatus() {
+    const ConnectivityLcdState nextState = currentConnectivityState();
+    if (nextState != connectivityLcdState) {
+        connectivityLcdState = nextState;
+        connectivityMessageAtMs = millis();
+        onlineAnnouncementActive = nextState == ConnectivityLcdState::ONLINE;
+        if (nextState == ConnectivityLcdState::ONLINE) mqttWasConnected = true;
+
+        Serial.printf(
+            "[LCD/AG] Durum: %s\n",
+            nextState == ConnectivityLcdState::ONLINE
+                ? "ETHERNET+MQTT BAGLI"
+                : (nextState == ConnectivityLcdState::MQTT_WAITING
+                    ? "ETHERNET BAGLI, MQTT YOK"
+                    : "ETHERNET YOK")
+        );
+
+        if (DoorState::mevcutDurumuAl() == Durum::BEKLEMEDE && !doorOpenAlarmActive) {
+            showCurrentConnectivityMessage();
+        }
+    }
+
+    if (
+        onlineAnnouncementActive
+        && millis() - connectivityMessageAtMs >= ONLINE_LCD_MESSAGE_MS
+    ) {
+        onlineAnnouncementActive = false;
+        // MQTT BAGLANDI mesaji bittikten sonra bekleme ekranini zorla yenile.
+        lastLcdWorkflowState = Durum::ALARM;
+    }
+}
+
 static void updateLcdWorkflowState() {
     if (doorOpenAlarmActive) {
         lcdDisplay.showAlarm();
@@ -399,6 +469,20 @@ static void updateLcdWorkflowState() {
     }
 
     const Durum currentState = DoorState::mevcutDurumuAl();
+
+    // Normal bekleme durumunda ag hatasi kalici olarak gorunsun. Kart/PIN,
+    // onay/red ve alarm ekranlari bu mesaja gore her zaman onceliklidir.
+    if (currentState == Durum::BEKLEMEDE) {
+        if (
+            connectivityLcdState == ConnectivityLcdState::ETHERNET_DOWN
+            || connectivityLcdState == ConnectivityLcdState::MQTT_WAITING
+        ) {
+            showCurrentConnectivityMessage();
+            return;
+        }
+        if (onlineAnnouncementActive) return;
+    }
+
     if (currentState == lastLcdWorkflowState) return;
 
     switch (currentState) {
@@ -431,6 +515,15 @@ void setup() {
     Serial.begin(115200);
     Serial.println("[SYSTEM] SecureDoor baslatiliyor...");
 
+    // W5500 ve MFRC522 ayni VSPI hattini paylasir. Her iki CS hattini da
+    // pasif yapip SPI'yi yalnizca bir kez baslatmak cihazlarin birbirini
+    // secmesini ve Ethernet baglantisinin RFID kurtarmasinda bozulmasini onler.
+    pinMode(RFID_SS_PIN, OUTPUT);
+    digitalWrite(RFID_SS_PIN, HIGH);
+    pinMode(ETHERNET_CS_PIN, OUTPUT);
+    digitalWrite(ETHERNET_CS_PIN, HIGH);
+    SPI.begin(RFID_SCK_PIN, RFID_MISO_PIN, RFID_MOSI_PIN);
+
     pinMode(SENSOR_PIN, INPUT);
     lcdDisplay.begin();
     lcdDisplay.showBoot();
@@ -450,10 +543,12 @@ void setup() {
     keypadInput.begin();
     accessControl.begin();
     OfflineQueue::baslat();
+    lcdDisplay.showEthernetConnecting();
     network.begin();
-
-    if (WiFi.status() == WL_CONNECTED) {
-        configTime(ZAMAN_DILIMI_DK * 60, 0, NTP_SUNUCU_1, NTP_SUNUCU_2);
+    if (network.isConnected()) {
+        lcdDisplay.showEthernetConnected(network.localIpString());
+    } else {
+        lcdDisplay.showEthernetDisconnected();
     }
 
     DoorState::durumGecisiYap(Durum::BEKLEMEDE);
@@ -470,6 +565,7 @@ void loop() {
     network.update();
     syncRtcFromNtpIfNeeded();
     mqttManager.update();
+    updateConnectivityLcdStatus();
     accessControl.loop();
     processPendingCommands();
     checkAccessResponseTimeout();

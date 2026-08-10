@@ -1,5 +1,7 @@
 #include "AlertSystem.h"
 
+#include <Wire.h>
+
 static constexpr uint8_t BUZZER_PWM_CHANNEL = 7;
 static constexpr uint8_t BUZZER_PWM_RESOLUTION = 10;
 static constexpr uint32_t BUZZER_PWM_MAX_DUTY =
@@ -114,7 +116,8 @@ AlertSystem::AlertSystem(
     uint8_t blueLedPin,
     bool blueLedActiveHigh,
     uint8_t redLedPin,
-    bool redLedActiveHigh
+    bool redLedActiveHigh,
+    uint8_t ledExpanderAddress
 )
     : _buzzerPin(buzzerPin),
       _ledPin(ledPin),
@@ -124,6 +127,9 @@ AlertSystem::AlertSystem(
       _ledActiveHigh(ledActiveHigh),
       _blueLedActiveHigh(blueLedActiveHigh),
       _redLedActiveHigh(redLedActiveHigh),
+      _ledExpanderAddress(ledExpanderAddress),
+      _ledExpanderState(0xFF),
+      _lastLedExpanderErrorAtMs(0),
       _activePattern(AlertPattern::None),
       _activeSteps(nullptr),
       _activeStepCount(0),
@@ -135,12 +141,26 @@ AlertSystem::AlertSystem(
 
 void AlertSystem::begin() {
     pinMode(_buzzerPin, OUTPUT);
-    pinMode(_ledPin, OUTPUT);
-    if (_blueLedPin != 255) {
-        pinMode(_blueLedPin, OUTPUT);
-    }
-    if (_redLedPin != 255) {
-        pinMode(_redLedPin, OUTPUT);
+
+    if (_ledExpanderAddress == 0) {
+        pinMode(_ledPin, OUTPUT);
+        if (_blueLedPin != 255) {
+            pinMode(_blueLedPin, OUTPUT);
+        }
+        if (_redLedPin != 255) {
+            pinMode(_redLedPin, OUTPUT);
+        }
+    } else {
+        // PCF8574 guc acilisinda tum uclari HIGH birakir. Ortak arti RGB
+        // LED icin HIGH=sonuk oldugundan once tum renkleri guvenle kapat.
+        _ledExpanderState = 0xFF;
+        const bool ledExpanderReady = writeLedExpanderState();
+        Serial.printf(
+            ledExpanderReady
+                ? "[RGB LED] PCF8574T hazir (adres=0x%02X, P0/P3/P5).\n"
+                : "[RGB LED] PCF8574T bulunamadi (adres=0x%02X). I2C ve adres anahtarlarini kontrol edin.\n",
+            _ledExpanderAddress
+        );
     }
 
     ledcSetup(BUZZER_PWM_CHANNEL, 2000, BUZZER_PWM_RESOLUTION);
@@ -311,7 +331,7 @@ AlertPattern AlertSystem::getActivePattern() const {
 }
 
 void AlertSystem::setLed(bool enabled) {
-    writeOutput(
+    writeLedOutput(
         _ledPin,
         enabled,
         _ledActiveHigh
@@ -577,12 +597,45 @@ void AlertSystem::finishPattern() {
 
 void AlertSystem::setBlueLed(bool enabled) {
     if (_blueLedPin == 255) return;
-    writeOutput(_blueLedPin, enabled, _blueLedActiveHigh);
+    writeLedOutput(_blueLedPin, enabled, _blueLedActiveHigh);
 }
 
 void AlertSystem::setRedLed(bool enabled) {
     if (_redLedPin == 255) return;
-    writeOutput(_redLedPin, enabled, _redLedActiveHigh);
+    writeLedOutput(_redLedPin, enabled, _redLedActiveHigh);
+}
+
+void AlertSystem::writeLedOutput(
+    uint8_t pin,
+    bool enabled,
+    bool activeHigh
+) {
+    if (_ledExpanderAddress == 0) {
+        writeOutput(pin, enabled, activeHigh);
+        return;
+    }
+
+    if (pin > 7) return;
+
+    const bool outputHigh = enabled == activeHigh;
+    bitWrite(_ledExpanderState, pin, outputHigh ? 1 : 0);
+    writeLedExpanderState();
+}
+
+bool AlertSystem::writeLedExpanderState() {
+    Wire.beginTransmission(_ledExpanderAddress);
+    Wire.write(_ledExpanderState);
+    const bool success = Wire.endTransmission() == 0;
+
+    if (!success && millis() - _lastLedExpanderErrorAtMs >= 3000) {
+        _lastLedExpanderErrorAtMs = millis();
+        Serial.printf(
+            "[RGB LED] PCF8574T I2C yazma hatasi (adres=0x%02X).\n",
+            _ledExpanderAddress
+        );
+    }
+
+    return success;
 }
 
 void AlertSystem::writeOutput(

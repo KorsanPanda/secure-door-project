@@ -17,10 +17,9 @@ CardReader::CardReader(uint8_t ssPin, uint8_t rstPin, uint8_t sckPin, uint8_t mi
       _sckPin(sckPin), _misoPin(misoPin), _mosiPin(mosiPin) {}
 
 bool CardReader::okuyucuyuBaslat() {
-    // Her yeniden baglanmada ESP32 SPI birimini de temiz baslat.
-    SPI.end();
-    delay(5);
-    SPI.begin(_sckPin, _misoPin, _mosiPin, _ssPin);
+    // SPI hatti W5500 ile ortaktir ve main.cpp'de bir kez baslatilir.
+    // Burada SPI.end()/SPI.begin() yapmak aktif Ethernet oturumlarini bozar.
+    // Yalnizca RFID'nin kendi CS ve reset hatlarini yeniden baslat.
     // Bazı RC522 klonları soft reset sırasında kilitli kalabiliyor. Her
     // başlangıç/yeniden bağlanma denemesinde RST hattından gerçek donanım
     // reseti uygulayarak SPI haberleşmesini temiz bir durumdan başlat.

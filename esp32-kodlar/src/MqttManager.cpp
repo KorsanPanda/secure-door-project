@@ -23,7 +23,7 @@ MqttManager::MqttManager(const char *brokerHost, uint16_t brokerPort) {
     _mqttClient.setServer(brokerHost, brokerPort);
     _mqttClient.setCallback(mqttCallbackTrampoline);
     _mqttClient.setBufferSize(4096);
-#if defined(MQTT_USE_TLS) && MQTT_USE_TLS
+#if (!defined(NETWORK_USE_ETHERNET) || !NETWORK_USE_ETHERNET) && defined(MQTT_USE_TLS) && MQTT_USE_TLS
     // Bulut broker TLS: sunucu sertifikasi dogrulanmaz ama trafik sifrelenir.
     // Tam dogrulama istenirse setInsecure yerine setCACert(root_ca) kullanilabilir.
     _wifiClient.setInsecure();
@@ -32,9 +32,20 @@ MqttManager::MqttManager(const char *brokerHost, uint16_t brokerPort) {
 }
 
 void MqttManager::attemptReconnect() {
+#if defined(NETWORK_USE_ETHERNET) && NETWORK_USE_ETHERNET
+    const IPAddress ethernetIp = Ethernet.localIP();
+    const bool networkConnected =
+        Ethernet.hardwareStatus() != EthernetNoHardware
+        && Ethernet.linkStatus() != LinkOFF
+        && (ethernetIp[0] != 0 || ethernetIp[1] != 0 || ethernetIp[2] != 0 || ethernetIp[3] != 0);
+    if (!networkConnected) {
+        return;
+    }
+#else
     if (WiFi.status() != WL_CONNECTED) {
         return;
     }
+#endif
 
     Serial.print("[MqttManager] Broker'a baglaniliyor... ");
     const std::string clientId = "SecureDoor_ESP32_" + std::to_string(DEVICE_ID);
@@ -78,7 +89,13 @@ bool MqttManager::publishHeartbeat(int cihazId) {
     JsonDocument doc;
     doc["cihaz_id"] = cihazId;
     doc["durum"] = "cevrimici";
+#if defined(NETWORK_USE_ETHERNET) && NETWORK_USE_ETHERNET
+    doc["baglanti_tipi"] = "ethernet";
+    doc["ip_adresi"] = Ethernet.localIP().toString();
+#else
+    doc["baglanti_tipi"] = "wifi";
     doc["wifi_rssi"] = WiFi.RSSI();
+#endif
     doc["firmware_versiyon"] = FIRMWARE_VERSION;
     doc["zaman"] = millis();
 

@@ -21,6 +21,12 @@ public:
     void showDenied();
     void showConnectionUnavailable();
     void showAlarm();
+    void showEthernetConnecting();
+    void showEthernetConnected(const String &ipAddress);
+    void showEthernetDisconnected();
+    void showMqttWaiting();
+    void showMqttConnected();
+    void showMqttDisconnected();
 
 private:
     static constexpr uint8_t COLUMN_COUNT = 16;

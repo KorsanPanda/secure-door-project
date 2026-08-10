@@ -15,6 +15,7 @@ private:
 
     static bool isValidHttpUrl(const std::string &url);
     static bool isValidMd5(const std::string &md5);
+    bool performEthernetDownload(const DeviceCommand &command);
 };
 
 #endif

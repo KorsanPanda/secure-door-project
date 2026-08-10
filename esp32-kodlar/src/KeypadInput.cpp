@@ -42,6 +42,7 @@ void KeypadInput::begin() {
     _keypad.setDebounceTime(10);
     _started = true;
     resetPinBuffer();
+    Serial.println("[Keypad] Dogrudan ESP32 GPIO baglantisi hazir.");
 }
 
 void KeypadInput::update() {
@@ -50,7 +51,7 @@ void KeypadInput::update() {
     }
 
     _keyPressedThisUpdate = false;
-    char key = _keypad.getKey();
+    const char key = _keypad.getKey();
     if (key != NO_KEY) {
         _keyPressedThisUpdate = true;
         _lastInputTime = millis();

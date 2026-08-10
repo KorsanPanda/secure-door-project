@@ -1,4 +1,5 @@
 #include "LcdDisplay.h"
+#include "config.h"
 
 LcdDisplay::LcdDisplay(uint8_t sdaPin, uint8_t sclPin)
     : _sdaPin(sdaPin),
@@ -126,8 +127,47 @@ void LcdDisplay::showAlarm() {
     showLines("UYARI / ALARM", "Kapiyi kontrol");
 }
 
+void LcdDisplay::showEthernetConnecting() {
+    showLines("ETHERNET", "BAGLANIYOR...");
+}
+
+void LcdDisplay::showEthernetConnected(const String &ipAddress) {
+    showLines("ETHERNET TAMAM", "IP:" + ipAddress);
+}
+
+void LcdDisplay::showEthernetDisconnected() {
+    showLines("ETHERNET YOK", "KABLO/DHCP BAK");
+}
+
+void LcdDisplay::showMqttWaiting() {
+    showLines("ETHERNET TAMAM", "MQTT BEKLENIYOR");
+}
+
+void LcdDisplay::showMqttConnected() {
+    showLines("MQTT BAGLANDI", "SUNUCU AKTIF");
+}
+
+void LcdDisplay::showMqttDisconnected() {
+    showLines("MQTT BAGLANMADI", "SUNUCU/PORT BAK");
+}
+
 bool LcdDisplay::detectAddress() {
+    // RGB LED icin eklenen PCF8574T LCD sirt kartiyla ayni adres ailesindedir.
+    // Once yaygin LCD adreslerini dene ve LED genisletici adresini
+    // kesinlikle LCD olarak secme.
+    const uint8_t preferredAddresses[] = {0x27, 0x3F};
+    for (const uint8_t address : preferredAddresses) {
+        if (address == PCF8574_LED_ADDRESS) continue;
+        Wire.beginTransmission(address);
+        if (Wire.endTransmission() == 0) {
+            _address = address;
+            Serial.printf("[LCD] I2C LCD bulundu: 0x%02X\n", address);
+            return true;
+        }
+    }
+
     for (uint8_t address = 1; address < 127; ++address) {
+        if (address == PCF8574_LED_ADDRESS) continue;
         Wire.beginTransmission(address);
         if (Wire.endTransmission() == 0) {
             Serial.printf("[LCD] I2C cihaz bulundu: 0x%02X\n", address);
