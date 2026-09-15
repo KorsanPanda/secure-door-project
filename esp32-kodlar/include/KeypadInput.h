@@ -80,6 +80,7 @@ public:
      * Tamamlanmış ve doğrulanmaya hazır bir PIN var mı?
      */
     bool isPinReady() const;
+    bool wasKeyPressed() const;
 
     /**
      * Son tuş basımından bu yana zaman aşımı oluştu mu?
@@ -149,6 +150,7 @@ private:
     bool _started;
     bool _pinReady;
     bool _timedOut;
+    bool _keyPressedThisUpdate;
 
     CustomKeypadEvent _lastEvent;
 

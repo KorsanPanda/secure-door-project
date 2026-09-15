@@ -1,165 +1,298 @@
 #include "AccessControl.h"
-#include <WiFi.h>          
-#include <HTTPClient.h>    
-#include <time.h>          
-#include "config.h"       
 
+#ifndef ARDUINOJSON_ENABLE_STD_STRING
+#define ARDUINOJSON_ENABLE_STD_STRING 1
+#endif
+#include <ArduinoJson.h>
+#include <algorithm>
+#include <cctype>
+
+#ifdef ARDUINO
+#include <esp_system.h>
+#include <mbedtls/sha256.h>
+#endif
+
+static std::string normalizeCardUid(std::string value) {
+    value.erase(
+        std::remove_if(value.begin(), value.end(), [](unsigned char character) {
+            return std::isspace(character) != 0;
+        }),
+        value.end()
+    );
+    std::transform(value.begin(), value.end(), value.begin(), [](unsigned char character) {
+        return static_cast<char>(std::toupper(character));
+    });
+    return value;
+}
+
+#ifdef ARDUINO
 AccessControl::AccessControl() {
-    failedAttempts = 0;
-    lockoutStartTime = 0;
-    systemLocked = false;
+    _lastOfflineUserId = "";
 }
 
 void AccessControl::begin() {
-    preferences.begin("whitelist", false); 
-    Serial.println("[AUTH] Erisim Kontrol Sistemi baslatildi.");
+    preferences.begin("securedoor", false);
+    _pinSalt = preferences.getString("pin_salt", "");
+    if (_pinSalt.length() != 32) {
+        char saltBuffer[33];
+        for (size_t index = 0; index < 16; ++index) {
+            snprintf(
+                saltBuffer + (index * 2),
+                3,
+                "%02x",
+                static_cast<unsigned int>(esp_random() & 0xff)
+            );
+        }
+        saltBuffer[32] = '\0';
+        _pinSalt = saltBuffer;
+        preferences.putString("pin_salt", _pinSalt);
+    }
+    migratePlaintextPins();
+    Serial.println("[AUTH] Erisim Kontrol Sistemi baslatildi (MQTT).");
+
+    String jsonList = preferences.getString("offline_pins", "[]");
+    JsonDocument doc;
+    const DeserializationError error = deserializeJson(doc, jsonList);
+    const size_t entryCount = (!error && doc.is<JsonArray>())
+        ? doc.as<JsonArray>().size()
+        : 0;
+    Serial.printf("[AUTH-OFFLINE] Kalici yerel yetki kaydi: %u\n", entryCount);
 }
 
 void AccessControl::loop() {
-    if (systemLocked) {
-        if (millis() - lockoutStartTime >= LOCKOUT_DURATION_MS) {
-            systemLocked = false; 
-            failedAttempts = 0;   
-            Serial.println("[AUTH] Sistem kilidi acildi.");
-        }
-    }
 }
 
-String AccessControl::hashOnly(String authData) {
-    uint32_t hash = 5381;
-    for (size_t i = 0; i < authData.length(); i++) {
-        hash = ((hash << 5) + hash) + (uint8_t)authData.charAt(i);
-    }
-    char buf[9];
-    snprintf(buf, sizeof(buf), "%08X", hash);
-    return String(buf);
-}
+bool AccessControl::verifyOfflineAccess(String authData, bool isCard) {
+    _lastOfflineUserId = "";
 
-String AccessControl::buildKey(char prefix, String authData, bool isCard) {
-    String key = "";
-    key += prefix;
-    key += (isCard ? "C" : "P");
-    key += hashOnly(authData);
-    return key; 
-}
-
-bool AccessControl::verifyAccess(String authData, bool isCard, bool &outWasEntry) {
-    if (systemLocked) {
-        outWasEntry = false; 
-        return false; 
-    }
-
-    if (!isCard && authData == getTodayTeacherPassword()) {
-        failedAttempts = 0;    
-        outWasEntry = true;    
-        return true;
-    }
-
-    if (WiFi.status() != WL_CONNECTED) {
-        if (!isCard) {
-            failedAttempts++;
-            if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
-                systemLocked = true;
-                lockoutStartTime = millis();
-            }
-        }
-        outWasEntry = false;
-        return false; 
-    }
-
-    bool accessGranted = false;
-    HTTPClient http;
-    http.begin(SERVER_URL); 
-    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-    
-    // 2000 ms Katı Timeout Süresi
-    http.setTimeout(HTTP_TIMEOUT_MS); 
-
-    String httpRequestData = "authData=" + authData + "&isCard=" + (isCard ? "1" : "0");
-    int httpResponseCode = http.POST(httpRequestData);
-
-    if (httpResponseCode == 200) {
-        String response = http.getString();
-        if (response.startsWith("OK") || response == "1") {
-            accessGranted = true;
-            outWasEntry = response.indexOf("EXIT") == -1; 
-        }
-    }
-    http.end(); 
-
-    if (accessGranted) {
-        failedAttempts = 0; 
-        return true;
-    } else {
-        failedAttempts++;
-        if (failedAttempts >= MAX_FAILED_ATTEMPTS) {
-            systemLocked = true;
-            lockoutStartTime = millis();
-        }
+    if (isCard) {
+        Serial.println("[AUTH-OFFLINE] Kart icin MQTT gerekli; cevrimdisi kart girisi kapali.");
         return false;
     }
+
+    String jsonList = preferences.getString("offline_pins", "[]");
+    std::string bulunanUserId(findUserByHashedPin(jsonList, authData).c_str());
+
+    if (!bulunanUserId.empty()) {
+        _lastOfflineUserId = String(bulunanUserId.c_str());
+        Serial.println(
+            String("[AUTH-OFFLINE] ")
+            + (isCard ? "Kart" : "Sifre")
+            + " dogrulandi. Kullanici ID: "
+            + _lastOfflineUserId
+        );
+        return true;
+    }
+
+    Serial.println(
+        String("[AUTH-OFFLINE] ")
+        + (isCard ? "Kart" : "Sifre")
+        + " yerel yetki listesinde bulunamadi."
+    );
+    return false;
 }
 
-void AccessControl::blockUser(String authData, bool isCard) {
-    String key = buildKey('S', authData, isCard);
-    preferences.putUChar(key.c_str(), STATUS_BLOCKED);
-}
+void AccessControl::rememberOfflineAccess(
+    String authData,
+    bool isCard,
+    String userId
+) {
+    if (isCard || authData.isEmpty() || userId.isEmpty()) return;
 
-void AccessControl::unblockUser(String authData, bool isCard) {
-    String statusKey = buildKey('S', authData, isCard);
-    String violationKey = buildKey('V', authData, isCard);
-    preferences.putUChar(statusKey.c_str(), STATUS_ACTIVE);
-    preferences.putInt(violationKey.c_str(), 0);
-}
+    String jsonList = preferences.getString("offline_pins", "[]");
+    JsonDocument doc;
+    if (deserializeJson(doc, jsonList) || !doc.is<JsonArray>()) {
+        doc.clear();
+        doc.to<JsonArray>();
+    }
 
-bool AccessControl::isSystemLockedOut() { return systemLocked; }
-
-int AccessControl::getRemainingLockoutSeconds() {
-    if (!systemLocked) return 0;
-    unsigned long passed = millis() - lockoutStartTime;
-    if (passed >= (unsigned long)LOCKOUT_DURATION_MS) return 0;
-    return (LOCKOUT_DURATION_MS - passed) / 1000;
-}
-
-void AccessControl::syncWithServer() {
-    if (WiFi.status() != WL_CONNECTED) return; 
-
-    HTTPClient http;
-    http.begin(String(SERVER_URL) + "/get_all_users"); 
-    http.setTimeout(HTTP_TIMEOUT_MS);
-    http.GET();
-    http.end();
-}
-
-bool AccessControl::syncTeacherPassword() {
-    if (WiFi.status() != WL_CONNECTED) return false; 
-
-    bool success = false;
-    HTTPClient http;
-    http.begin(String(SERVER_URL) + "/get_teacher_password"); 
-    http.setTimeout(HTTP_TIMEOUT_MS); 
-
-    int httpResponseCode = http.GET();
-    if (httpResponseCode == 200) {
-        String newPassword = http.getString();
-        newPassword.trim(); 
-        if (newPassword.length() > 0) {
-            setTeacherPassword(newPassword);
-            success = true;
+    JsonArray entries = doc.as<JsonArray>();
+    JsonObject target;
+    for (JsonObject entry : entries) {
+        const String storedUserId = entry["u"] | "";
+        if (storedUserId == userId) {
+            target = entry;
+            break;
         }
     }
-    http.end();
-    return success;
-}
 
-// Yeni şifreyi kalıcı hafızaya tam eskisin üstüne yazar
-void AccessControl::setTeacherPassword(const String& newPassword) {
-    if (newPassword.length() > 0) {
-        preferences.putString("today_pwd", newPassword);
-        Serial.printf("[AUTH] Ogretmen sifresi guncellendi: %s\n", newPassword.c_str());
+    if (target.isNull()) {
+        target = entries.add<JsonObject>();
+        target["u"] = userId;
     }
+
+    target["h"] = hashPin(authData);
+    target.remove("p");
+
+    String updatedList;
+    serializeJson(doc, updatedList);
+    preferences.putString("offline_pins", updatedList);
+    Serial.println(
+        String("[AUTH-OFFLINE] Sunucunun onayladigi ")
+        + "sifre"
+        + " kalici hafizaya kaydedildi."
+    );
 }
 
-String AccessControl::getTodayTeacherPassword() {
-    return preferences.getString("today_pwd", "1234");
+void AccessControl::syncOfflinePins(String jsonList, bool replaceList) {
+    String listToStore = jsonList;
+
+    if (!replaceList) {
+        JsonDocument incomingDoc;
+        DeserializationError incomingError = deserializeJson(incomingDoc, jsonList);
+        if (incomingError || !incomingDoc.is<JsonArray>()) {
+            Serial.println("[AUTH] Gelen offline sifre listesi gecersiz, kaydedilmedi.");
+            return;
+        }
+
+        String currentJson = preferences.getString("offline_pins", "[]");
+        JsonDocument currentDoc;
+        DeserializationError currentError = deserializeJson(currentDoc, currentJson);
+
+        JsonDocument mergedDoc;
+        JsonArray mergedList = mergedDoc.to<JsonArray>();
+        JsonArray incomingList = incomingDoc.as<JsonArray>();
+
+        if (!currentError && currentDoc.is<JsonArray>()) {
+            for (JsonObject currentUser : currentDoc.as<JsonArray>()) {
+                const String currentUserId = currentUser["u"] | "";
+                bool replaced = false;
+
+                for (JsonObject incomingUser : incomingList) {
+                    const String incomingUserId = incomingUser["u"] | "";
+                    if (currentUserId == incomingUserId) {
+                        replaced = true;
+                        break;
+                    }
+                }
+
+                if (!replaced) {
+                    mergedList.add(currentUser);
+                }
+            }
+        }
+
+        for (JsonObject incomingUser : incomingList) {
+            mergedList.add(incomingUser);
+        }
+
+        listToStore = "";
+        serializeJson(mergedDoc, listToStore);
+    }
+
+    JsonDocument storageDoc;
+    const DeserializationError storageError = deserializeJson(storageDoc, listToStore);
+    if (storageError || !storageDoc.is<JsonArray>()) {
+        Serial.println("[AUTH] Gelen offline liste gecersiz, kaydedilmedi.");
+        return;
+    }
+
+    for (JsonObject entry : storageDoc.as<JsonArray>()) {
+        const String plainPin = entry["p"] | "";
+        if (!plainPin.isEmpty()) {
+            entry["h"] = hashPin(plainPin);
+            entry.remove("p");
+        }
+        entry.remove("kartUid");
+        entry.remove("kart_uid");
+    }
+
+    listToStore = "";
+    serializeJson(storageDoc, listToStore);
+    preferences.putString("offline_pins", listToStore);
+    Serial.println("[AUTH] Yeni offline kisi/sifre listesi NVS hafizaya kaydedildi.");
+}
+
+String AccessControl::hashPin(const String &pin) const {
+    const String saltedValue = _pinSalt + ":" + pin;
+    unsigned char digest[32];
+    mbedtls_sha256_ret(
+        reinterpret_cast<const unsigned char*>(saltedValue.c_str()),
+        saltedValue.length(),
+        digest,
+        0
+    );
+
+    char hexDigest[65];
+    for (size_t index = 0; index < sizeof(digest); ++index) {
+        snprintf(hexDigest + (index * 2), 3, "%02x", digest[index]);
+    }
+    hexDigest[64] = '\0';
+    return String(hexDigest);
+}
+
+String AccessControl::findUserByHashedPin(
+    const String &jsonList,
+    const String &pin
+) const {
+    JsonDocument doc;
+    if (deserializeJson(doc, jsonList) || !doc.is<JsonArray>()) return "";
+
+    const String candidateHash = hashPin(pin);
+    for (JsonObject user : doc.as<JsonArray>()) {
+        const String storedHash = user["h"] | "";
+        if (storedHash.length() != candidateHash.length()) continue;
+
+        unsigned char difference = 0;
+        for (size_t index = 0; index < storedHash.length(); ++index) {
+            difference |= static_cast<unsigned char>(
+                storedHash[index] ^ candidateHash[index]
+            );
+        }
+        if (difference == 0) return user["u"] | "";
+    }
+    return "";
+}
+
+void AccessControl::migratePlaintextPins() {
+    String jsonList = preferences.getString("offline_pins", "[]");
+    JsonDocument doc;
+    if (deserializeJson(doc, jsonList) || !doc.is<JsonArray>()) return;
+
+    bool changed = false;
+    for (JsonObject entry : doc.as<JsonArray>()) {
+        const String plainPin = entry["p"] | "";
+        if (plainPin.isEmpty()) continue;
+        entry["h"] = hashPin(plainPin);
+        entry.remove("p");
+        changed = true;
+    }
+
+    for (JsonObject entry : doc.as<JsonArray>()) {
+        if (entry.containsKey("kartUid") || entry.containsKey("kart_uid")) {
+            entry.remove("kartUid");
+            entry.remove("kart_uid");
+            changed = true;
+        }
+    }
+
+    if (!changed) return;
+    String migratedList;
+    serializeJson(doc, migratedList);
+    preferences.putString("offline_pins", migratedList);
+    Serial.println("[AUTH-OFFLINE] Eski PIN kayitlari guvenli ozete donusturuldu.");
+}
+
+String AccessControl::getLastOfflineUserId() {
+    return _lastOfflineUserId;
+}
+#endif
+
+std::string AccessControl::findUserByOfflinePin(
+    const std::string &jsonList,
+    const std::string &pin
+) {
+    JsonDocument doc;
+    DeserializationError err = deserializeJson(doc, jsonList);
+
+    if (!err && doc.is<JsonArray>()) {
+        for (JsonObject user : doc.as<JsonArray>()) {
+            std::string storedPin = user["p"].as<std::string>();
+            if (pin == storedPin) {
+                return user["u"].as<std::string>();
+            }
+        }
+    }
+
+    return "";
 }

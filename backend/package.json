@@ -1,0 +1,50 @@
+{
+  "name": "kapi-sistemi-backend",
+  "version": "1.0.0",
+  "description": "Kapi sistemi backend uygulamasi",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "test": "cross-env NODE_ENV=test jest --detectOpenHandles --forceExit --runInBand",
+    "import:academic-staff": "node prisma/import-academic-staff.js"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.9.1",
+    "@prisma/client": "^7.9.1",
+    "argon2": "^0.45.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^4.22.2",
+    "express-rate-limit": "^8.1.0",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mqtt": "^5.15.2",
+    "nodemailer": "^9.0.5",
+    "node-cron": "^4.6.0",
+    "pg": "^8.22.0",
+    "qrcode": "^1.5.4"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "@prisma/config": "^7.9.1",
+    "cross-env": "^10.1.0",
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14",
+    "prisma": "^7.9.1",
+    "supertest": "^7.2.2"
+  },
+  "overrides": {
+    "fast-uri": "3.1.5",
+    "find-my-way": "9.7.0",
+    "ip-address": "10.4.0",
+    "valibot": "1.4.2"
+  }
+}

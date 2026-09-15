@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Şifre Sıfırla · SecureLab</title>
+<script>(function(){try{var t=localStorage.getItem('securelab-theme');if(t!=='dark'&&t!=='light'){t=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/css/tokens.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/base.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/standalone.css?v=20260811-1">
+<link rel="stylesheet" href="assets/css/components.css?v=20260811-1">
+</head>
+<body class="standalone-body" data-page="sifre-sifirla">
+<div class="auth-shell">
+  <section class="auth-hero">
+    <div class="auth-hero-brand">
+      <span class="auth-hero-brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 9.5-4-1.2-7-5-7-9.5V6l7-3Z"></path><path d="M9.5 12l1.8 1.8L14.7 10"></path></svg>
+      </span>
+      <span>SecureLab</span>
+    </div>
+    <div class="auth-hero-body">
+      <h1 class="auth-hero-title">Yeni şifrenizi belirleyin</h1>
+      <p class="auth-hero-text">Güvenliğiniz için en az 8 karakter uzunluğunda, en az bir harf ve bir rakam içeren bir şifre seçin.</p>
+    </div>
+    <div class="auth-hero-footer">© 2026 SecureLab · Kurumsal Erişim Kontrol Sistemi</div>
+  </section>
+
+  <section class="auth-panel">
+    <div class="auth-theme-toggle" id="authThemeToggle"></div>
+    <div class="auth-card">
+      <div class="auth-card-header">
+        <h2 class="auth-card-title">Şifreyi Sıfırla</h2>
+        <p class="auth-card-subtitle">Hesabınız için yeni bir şifre oluşturun.</p>
+      </div>
+
+      <div id="resetAlert" role="alert"></div>
+
+      <form class="auth-form" id="resetForm" novalidate>
+        <div class="field">
+          <label class="field-label" for="yeniSifre">Yeni şifre</label>
+          <div class="input-group">
+            <input class="form-control" type="password" id="yeniSifre" name="yeniSifre" autocomplete="new-password" placeholder="En az 8 karakter" required minlength="8" maxlength="72">
+            <button type="button" class="input-group-btn" id="toggleNewPassword" aria-label="Şifreyi göster">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </button>
+          </div>
+          <span class="field-hint">8-72 karakter, en az bir harf ve bir rakam içermelidir.</span>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="yeniSifreTekrar">Yeni şifre (tekrar)</label>
+          <input class="form-control" type="password" id="yeniSifreTekrar" name="yeniSifreTekrar" autocomplete="new-password" placeholder="Şifrenizi tekrar girin" required minlength="8" maxlength="72">
+          <span class="field-error">Şifreler eşleşmiyor.</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-block" id="resetSubmit">
+          <span id="resetSubmitText">Şifreyi Güncelle</span>
+        </button>
+
+        <a class="auth-card-back" href="login.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg>
+          Girişe dön
+        </a>
+      </form>
+    </div>
+  </section>
+</div>
+
+<script src="assets/js/api.js?v=20260811-1" defer></script>
+<script src="assets/js/theme.js?v=20260811-1" defer></script>
+<script src="assets/js/ui.js?v=20260811-1" defer></script>
+<script src="assets/js/sifre-sifirla.js?v=20260811-1" defer></script>
+</body>
+</html>

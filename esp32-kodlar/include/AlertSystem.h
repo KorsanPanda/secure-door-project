@@ -10,6 +10,7 @@
  */
 enum class AlertPattern : uint8_t {
     None,
+    Keypress,
     Success,
     Error,
     InvalidPin,
@@ -38,7 +39,12 @@ public:
         uint8_t buzzerPin,
         uint8_t ledPin,
         bool buzzerActiveHigh = true,
-        bool ledActiveHigh = true
+        bool ledActiveHigh = true,
+        uint8_t blueLedPin = 255,
+        bool blueLedActiveHigh = true,
+        uint8_t redLedPin = 255,
+        bool redLedActiveHigh = true,
+        uint8_t ledExpanderAddress = 0
     );
 
     /**
@@ -60,6 +66,7 @@ public:
      */
     bool play(AlertPattern pattern);
 
+    bool playKeypress();
     bool playSuccess();
     bool playError();
     bool playInvalidPin();
@@ -69,6 +76,7 @@ public:
     bool playForcedEntry();
     bool playOffline();
     bool playDeviceError();
+    void setPinEntryActive(bool active);
 
     /**
      * Aktif alarmı koşulsuz durdurur.
@@ -110,9 +118,16 @@ private:
 
     uint8_t _buzzerPin;
     uint8_t _ledPin;
+    uint8_t _blueLedPin;
+    uint8_t _redLedPin;
 
     bool _buzzerActiveHigh;
     bool _ledActiveHigh;
+    bool _blueLedActiveHigh;
+    bool _redLedActiveHigh;
+    uint8_t _ledExpanderAddress;
+    uint8_t _ledExpanderState;
+    uint32_t _lastLedExpanderErrorAtMs;
 
     AlertPattern _activePattern;
 
@@ -122,9 +137,11 @@ private:
 
     bool _repeat;
     bool _started;
+    bool _pinEntryActive;
 
     uint32_t _stepStartedAt;
 
+    static const AlertStep KEYPRESS_STEPS[];
     static const AlertStep SUCCESS_STEPS[];
     static const AlertStep ERROR_STEPS[];
     static const AlertStep ACCESS_DENIED_STEPS[];
@@ -149,6 +166,14 @@ private:
 
     void applyCurrentStep();
     void finishPattern();
+    void setBlueLed(bool enabled);
+    void setRedLed(bool enabled);
+    void writeLedOutput(
+        uint8_t pin,
+        bool enabled,
+        bool activeHigh
+    );
+    bool writeLedExpanderState();
 
     void writeOutput(
         uint8_t pin,

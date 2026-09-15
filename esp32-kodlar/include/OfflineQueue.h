@@ -6,7 +6,7 @@
 #include <LittleFS.h>
 
 struct CevrimdisiOlay {
-    char veri[20];       
+    char veri[32];
     char yontem[15];     
     unsigned long zamanDamgasi;
     bool basarili;

@@ -1,0 +1,25 @@
+# 1. Bağımlılıklar ve Loglar (En Kritik Kısım)
+node_modules
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# 2. Ortam Değişkenleri ve Gizlilik
+# (Şifrelerin Docker imajına sızmasını önler)
+.env
+.env.*
+!.env.example
+
+# 3. Git ve Geliştirici Dosyaları
+.git
+.gitignore
+README.md
+
+# 4. Docker'ın Kendi Yapılandırma Dosyaları
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# 5. İşletim Sistemi Kalıntıları (Mac/Windows gizli dosyaları)
+.DS_Store
+Thumbs.db

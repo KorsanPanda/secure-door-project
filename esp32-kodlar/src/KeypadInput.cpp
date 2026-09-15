@@ -32,6 +32,7 @@ KeypadInput::KeypadInput(
       _started(false),
       _pinReady(false),
       _timedOut(false),
+      _keyPressedThisUpdate(false),
       _lastEvent{} {
     normalizePinLimits();
     resetPinBuffer();
@@ -41,6 +42,7 @@ void KeypadInput::begin() {
     _keypad.setDebounceTime(10);
     _started = true;
     resetPinBuffer();
+    Serial.println("[Keypad] Dogrudan ESP32 GPIO baglantisi hazir.");
 }
 
 void KeypadInput::update() {
@@ -48,8 +50,10 @@ void KeypadInput::update() {
         return;
     }
 
-    char key = _keypad.getKey();
+    _keyPressedThisUpdate = false;
+    const char key = _keypad.getKey();
     if (key != NO_KEY) {
+        _keyPressedThisUpdate = true;
         _lastInputTime = millis();
         _timedOut = false;
         processKey(key);
@@ -60,6 +64,10 @@ void KeypadInput::update() {
 
 bool KeypadInput::isPinReady() const {
     return _pinReady;
+}
+
+bool KeypadInput::wasKeyPressed() const {
+    return _keyPressedThisUpdate;
 }
 
 bool KeypadInput::hasTimedOut() const {
@@ -150,6 +158,7 @@ void KeypadInput::handleDigit(char key) {
     ++_pinLength;
     _pinBuffer[_pinLength] = '\0';
 
+    // PIN sadece '#' tusuna basildiginda tamamlanir.
     setEvent(KeypadEventType::KeyPressed, key);
 }
 
